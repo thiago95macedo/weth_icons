@@ -1,4 +1,4 @@
-class CASTHI_ICON {
+class WETH_ICON {
     constructor(settings) {
         // Valores padrão
         this.font_color = "#ffffff";
@@ -8,15 +8,15 @@ class CASTHI_ICON {
         this.icon_class = "person";
         this.icon_width = "200"; // Tamanho fixo do ícone
         this.font_size = "160";  // 80% de 200px (proporção ERP)
-        this.casthi_version = "25.0";
+        this.weth_version = "25.0";
 
         // Aplica configurações personalizadas, exceto tamanhos
         if (settings != null) {
             // Copia todas as configurações, exceto tamanho do ícone e fonte
-            const settingsCopy = {...settings};
+            const settingsCopy = { ...settings };
             delete settingsCopy.icon_width;
             delete settingsCopy.font_size;
-            
+
             // Aplica as configurações, mantendo os tamanhos fixos
             Object.assign(this, settingsCopy);
         }
@@ -37,7 +37,7 @@ class CASTHI_ICON {
 
     _normalizeIconClass(iconClass) {
         if (!iconClass) return "person";
-        
+
         // Para Material Icons, apenas retorna o nome do ícone
         return iconClass.trim();
     }
@@ -57,22 +57,22 @@ class CASTHI_ICON {
 
     _setUp() {
         this.canvas = document.createElement("canvas");
-        this.canvas.setAttribute("class", "casthi-icon-canvas");
+        this.canvas.setAttribute("class", "weth-icon-canvas");
         this.canvas.height = this.icon_width;
         this.canvas.width = this.icon_width;
         this._ctx = this.canvas.getContext("2d");
-        
+
         // Limpar canvas e garantir transparência
         this._ctx.clearRect(0, 0, this.icon_width, this.icon_width);
         this._ctx.globalAlpha = 1.0; // Garantir opacidade total
-        
+
         this._ctx.font = `${this.font_weight} ${this.font_size}px "${this.font_family}"`;
     }
 
     _setBackground() {
         let radius = this.icon_width * 0.047;
         this._ctx.beginPath();
-        switch (this.casthi_version) {
+        switch (this.weth_version) {
             case "25.0":
                 this._ctx.moveTo(radius, 0);
                 this._ctx.lineTo(this.icon_width - radius, 0);
@@ -140,7 +140,7 @@ class CASTHI_ICON {
 
 
     _setInlineShadow() {
-        switch (this.casthi_version) {
+        switch (this.weth_version) {
             case "25.0":
                 let is_radius = this.icon_width * 0.047;
                 let is_height = this.icon_width * 0.015;
@@ -179,7 +179,7 @@ class CASTHI_ICON {
     }
 
     _setGradient() {
-        switch (this.casthi_version) {
+        switch (this.weth_version) {
             case "25.0":
                 this._ctx.save();
                 this._ctx.globalAlpha = 0.2;
@@ -206,13 +206,13 @@ class CASTHI_ICON {
         tempSpan.style.visibility = 'hidden';
         tempSpan.style.position = 'absolute';
         tempSpan.style.left = '-9999px';
-        
+
         document.body.appendChild(tempSpan);
-        
+
         // Para Material Icons, o texto é o próprio nome do ícone
         let char = iconName;
         let font_weight = window.getComputedStyle(tempSpan).getPropertyValue("font-weight");
-        
+
         document.body.removeChild(tempSpan);
 
         console.log("Ícone:", iconName, "Texto:", char, "Peso:", font_weight);
@@ -226,7 +226,7 @@ class CASTHI_ICON {
     }
 
     // SVG removido - foco apenas em PNG
-    
-    
+
+
     // Função removida - não mais necessária
 }
