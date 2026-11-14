@@ -3,958 +3,218 @@
 
 <head>
     <meta charset="utf-8">
-    <title>WETH Icon Studio — Gerador Oficial de Ícones</title>
-    <meta name="author" content="WETH Tecnologia">
+    <title>Gerador de Ícones</title>
+    <meta name="author" content="spilymp">
     <meta name="description"
-        content="Estúdio oficial de criação e padronização visual de ícones para o ecossistema WETH: Tabler Icons Outline (5.233 ícones nativos 100% categorizados) com Cartela Flat WETH (viewBox 50x50, raio 8px, Rim Light 22% & PNG HiDPI).">
+        content="Um construtor de ícones simples, que oferece a capacidade de criar ícones de aplicativos no estilo dos ícones de aplicativos do sistema WETH.">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" type="text/css" href="css/milligram.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
-    <script type="text/javascript" src="js/tabler_catalog.js"></script>
+    <link rel="stylesheet" type="text/css"
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
     <script type="text/javascript" src="js/weth_icon.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let icon = new WETH_ICON({
+                'font_family': 'Material Symbols Outlined',
+                'icon_class': 'person',
+                'icon_width': '200',
+                'font_size': '160'
+            });
+            icon.draw("icon");
+        });
+
+        function generate() {
+            document.getElementById("icon").innerHTML = '';
+
+            // Obtém o valor do nome do ícone Material
+            let iconValue = document.getElementById('iconClass').value.trim();
+
+            // Se não foi inserido nada, usa um ícone padrão
+            if (!iconValue) {
+                iconValue = 'person';
+            }
+
+            let icon = new WETH_ICON({
+                'font_color': document.getElementById('iconFontColor').value,
+                'font_family': 'Material Symbols Outlined',
+                'font_weight': document.getElementById('fontWeight').value,
+                'icon_background': document.getElementById('iconBackgroundColor').value,
+                'icon_class': iconValue,
+                'weth_version': document.getElementById('wethVersion').value,
+                // Tamanho fixo definido no código, não na interface (80% proporção ERP)
+                'icon_width': '200',
+                'font_size': '160'
+            });
+            icon.draw("icon");
+        }
+
+        function toggle_settings() {
+            document.querySelectorAll('.settings-card').forEach(function (element) {
+                element.classList.toggle('deactivated');
+            });
+        }
+
+        function downloadPNG() {
+            let image = document.getElementsByClassName('weth-icon-canvas')[0].toDataURL("image/png").replace("image/png", "image/octet-stream");
+            document.getElementById('downloadPNG').setAttribute('href', image);
+        }
+
+        // Função SVG removida - foco apenas em PNG
+
+        function populateIconSetWebsite() {
+            let iconSetWebsite = document.getElementById('iconSetWebsite');
+            let iconClassInput = document.getElementById('iconClass');
+
+            iconSetWebsite.href = "https://fonts.google.com/icons";
+            iconClassInput.placeholder = "ex. person, home, settings";
+        }
+    </script>
 </head>
 
 <body>
-    <!-- Barra de Navegação Institucional WETH -->
-    <header class="weth-navbar">
-        <div class="weth-navbar-container">
-            <div class="weth-brand-block">
-                <img src="assets/images/logo_branco.png" alt="WETH Tecnologia" class="weth-brand-logo">
-                <div class="weth-brand-title">
-                    Icon Studio
-                </div>
+    <div class="font_preload" style="opacity: 0">
+        <span style="font-family: 'Material Symbols Outlined', Arial, sans-serif;"></span>
+    </div>
+
+    <header class="container">
+        <div class="row">
+            <div class="column align-center">
+                <img src="assets/images/logo.png" alt="Logotipo WETH" style="max-width: 350px; height: auto;">
+                <h1>Gerador de Ícones</h1>
             </div>
-            <nav class="weth-nav-links">
-                <a href="docs/design_system.md" target="_blank" class="weth-nav-link" title="Consultar especificações técnicas">
-                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
-                        <path d="M3 19a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                        <path d="M3 6a9 9 0 0 1 9 0a9 9 0 0 1 9 0" />
-                        <path d="M3 6l0 13" />
-                        <path d="M12 6l0 13" />
-                        <path d="M21 6l0 13" />
-                    </svg>
-                    Design System
-                </a>
-            </nav>
         </div>
     </header>
 
-    <main class="studio-main" id="studio">
-        <!-- Banner de Validação do Ícone de Referência (Modo High) -->
-        <div class="reference-badge-card" style="background: var(--o-white); border: 1px solid var(--o-gray-300); border-radius: var(--radius-md); padding: 0.9rem 1.4rem; margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: var(--shadow-sm);">
-            <div style="display: flex; align-items: center; gap: 14px;">
-                <div style="width: 44px; height: 44px; border-radius: 8px; background: #64748b; border: 1px solid rgba(255,255,255,0.22); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(3,27,62,0.18);">
-                    <img src="assets/reference/icon.svg" style="width: 44px; height: 44px;" alt="Ícone de Referência WETH" id="refIconImg">
-                </div>
-                <div>
-                    <div style="font-weight: 700; font-size: 0.95rem; color: var(--o-brand-primary); display: flex; align-items: center; gap: 8px;">
-                        Padrão Monocromático Oficial • Tabler Icons Outline
-                        <span style="font-size: 0.72rem; font-weight: 600; background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 12px;">5.233 Ícones 100% Categorizados</span>
+    <div class="container">
+        <div class="row row-center">
+            <div class="column align-center settings-card front">
+                <div class="row">
+                    <div class="column column-center">
+                        <label for="wethVersion">WETH Versão</label>
                     </div>
-                    <div style="font-size: 0.78rem; color: var(--o-brand-secondary);">
-                        Cartela Unificada <b>Slate Blue Suporte (#64748B)</b> • Rim Light 22% • SVG 50×50 • PNG Padrão 128×128
+                    <div class="column">
+                        <select id="wethVersion">
+                            <option value="25.0">25.0</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row icon-set-website">
+                    <div class="column column-center column-50">
+                        <label for="iconClass">Ícone Material</label>
+                    </div>
+                    <div class="column column-40">
+                        <input id="iconClass" type="text" placeholder="ex. person, home, settings">
+                    </div>
+                    <div class="column">
+                        <a href="https://fonts.google.com/icons" id="iconSetWebsite" class="button button-outline"
+                            target="_blank">
+                            <i class="material-symbols-outlined button-icon">language</i>
+                        </a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column column-center">
+                        <label for="iconBackgroundColor">Cor do Background</label>
+                    </div>
+                    <div class="column">
+                        <input type="color" onchange="clickColor(0, -1, -1, 5)" value="#05285B"
+                            id="iconBackgroundColor">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column align-right">
+                        <button class="button button-outline" type="submit" value="Switch Settings"
+                            onclick="toggle_settings()">
+                            <i class="material-symbols-outlined button-icon">tune</i>
+                        </button>
+                        <button class="button button-outline" type="submit" value="Generate" onclick="generate()">
+                            <i class="material-symbols-outlined button-icon">play_arrow</i>
+                        </button>
+                        <a id="downloadPNG" download="weth_icon.png">
+                            <button type="submit" value="Download PNG" onclick="downloadPNG()">Download PNG</button>
+                        </a>
+                        <!-- Botão SVG removido - foco apenas em PNG -->
                     </div>
                 </div>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <a href="assets/reference/icon.svg" download="icon_referencia.svg" class="cat-btn" style="text-decoration: none; display: flex; align-items: center; gap: 6px; padding: 6px 12px;">
-                    <svg class="tabler-ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                        <path d="M7 11l5 5l5 -5" />
-                        <path d="M12 4l0 12" />
-                    </svg>
-                    Baixar SVG Referência
-                </a>
-                <button type="button" class="cat-btn" onclick="loadReferenceIcon()" style="display: flex; align-items: center; gap: 6px; padding: 6px 12px; background: var(--o-brand-primary); color: #fff; border-color: var(--o-brand-primary);">
-                    <svg class="tabler-ui-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M19.95 11a8 8 0 1 0 -.5 4m.5 5v-5h-5" />
-                    </svg>
-                    Carregar Referência
-                </button>
+
+            <div class="column align-center settings-card back deactivated">
+                <div class="row">
+                    <div class="column column-center">
+                        <label for="iconFontColor">Cor da Fonte</label>
+                    </div>
+                    <div class="column">
+                        <input id="iconFontColor" type="color" onchange="clickColor(0, -1, -1, 5)" value="#ffffff">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column column-center">
+                        <label for="fontWeight">Peso da Fonte</label>
+                    </div>
+                    <div class="column">
+                        <select id="fontWeight">
+                            <option value="900" selected>Normal</option>
+                            <option value="300">Light</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="column align-right">
+                        <button class="button button-outline" type="submit" value="Switch Settings"
+                            onclick="toggle_settings()">
+                            <i class="material-symbols-outlined button-icon">tune</i>
+                        </button>
+                        <button class="button button-outline" type="submit" value="Generate" onclick="generate()">
+                            <i class="material-symbols-outlined button-icon">play_arrow</i>
+                        </button>
+                        <a id="downloadPNG" download="weth_icon.png">
+                            <button type="submit" value="Download PNG" onclick="downloadPNG()">Download PNG</button>
+                        </a>
+                        <!-- Botão SVG removido - foco apenas em PNG -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="column align-center">
+                <div id="icon"></div>
             </div>
         </div>
-
-        <div class="studio-grid">
-            <!-- COLUNA ESQUERDA: Painel de Controles -->
-            <div class="controls-column">
-                
-                <!-- CARD 1: Seleção de Ícone e Glifo -->
-                <section class="studio-card">
-                    <div class="card-header">
-                        <span class="card-title">
-                            <svg class="tabler-ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z" />
-                                <path d="M9 15l2 2l4 -4" />
-                            </svg>
-                            1. Pictograma & Glifo (Tabler Icons — Outline)
-                        </span>
-                    </div>
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label class="form-label" for="iconClass">Nome do Ícone Selecionado</label>
-                            <div class="input-with-button">
-                                <input type="text" id="iconClass" placeholder="Ex: box, receipt, user, truck, settings" value="box">
-                                <a href="https://tabler.io/icons" target="_blank" rel="noopener" class="btn-icon-link" title="Consultar catálogo oficial online Tabler Icons">
-                                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" />
-                                        <path d="M21 21l-6 -6" />
-                                    </svg>
-                                </a>
-                            </div>
-                            <p class="form-hint">Biblioteca oficial: 5.233 pictogramas outline 100% organizados por categoria.</p>
-                        </div>
-
-                        <!-- Campo de Busca em Tempo Real -->
-                        <div class="form-group" style="margin-bottom: 0.8rem;">
-                            <label class="form-label" for="iconSearchInput" style="display: flex; justify-content: space-between;">
-                                <span>Pesquisa Instantânea de Ícones</span>
-                                <span id="searchResultCount" style="font-weight: 600; font-size: 0.76rem; color: var(--o-action);">5.233 ícones disponíveis</span>
-                            </label>
-                            <input type="text" id="iconSearchInput" placeholder="🔍 Filtrar por nome, categoria ou sinônimo (ex: estoque, fatura, truck, server)..." oninput="onSearchInputChange()">
-                        </div>
-
-                        <!-- Filtro de Categorias de Primeiro Nível (Macro-Grupos WETH / 100% Cobertura) -->
-                        <div style="margin-bottom: 0.6rem;">
-                            <label class="form-label" style="font-size: 0.78rem;">Categorias Principais:</label>
-                            <div class="category-filter-chips" id="macroCategoryChips">
-                                <button type="button" class="cat-btn active" onclick="filterMacro('all', this)" id="btnCatAll">Todos (5.233)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('tech', this)">TI & Sistemas (1.359)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('design', this)">Design & Mídia (1.137)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('ui_symbols', this)">Setas & Símbolos (785)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('erp', this)">ERP & Documentos (567)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('operations', this)">Operações & Serviços (489)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('supply', this)">Logística & Locais (455)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('finance', this)">Finanças & Vendas (231)</button>
-                                <button type="button" class="cat-btn" onclick="filterMacro('crm', this)">Comunicação & CRM (210)</button>
-                            </div>
-                        </div>
-
-                        <!-- Seletor Detalhado das 41 Subcategorias Tabler -->
-                        <div>
-                            <label class="form-label" for="subCategorySelect" style="font-size: 0.78rem;">Filtrar por Subcategoria Específica:</label>
-                            <select id="subCategorySelect" class="category-select-control" onchange="onSubCategoryChange()">
-                                <option value="all">Todas as 41 Subcategorias Especializadas (5.233 ícones)</option>
-                                <!-- Preenchido dinamicamente via JS com contagens exatas -->
-                            </select>
-                        </div>
-
-                        <!-- Grade de Ícones Carregados Localmente -->
-                        <div class="icon-selector-grid" id="iconSelectorGrid" style="max-height: 250px;">
-                            <!-- Inserido dinamicamente via JS -->
-                        </div>
-
-                        <!-- Botão Carregar Mais Ícones -->
-                        <div id="loadMoreWrap" style="text-align: center; margin-top: 6px; display: none;">
-                            <button type="button" class="cat-btn" onclick="loadMoreIcons()" style="width: 100%; padding: 6px; border-style: dashed;">
-                                Carregar mais ícones desta categoria...
-                            </button>
-                        </div>
-
-                        <!-- Ajustes Finos de Glifo -->
-                        <div class="controls-two-col" style="margin-top: 1.1rem; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
-                            <div class="form-group">
-                                <label class="form-label" for="glyphSize">Tamanho</label>
-                                <div class="slider-container">
-                                    <input type="range" id="glyphSize" min="18" max="34" value="26" oninput="onGlyphSettingChange()">
-                                    <span class="slider-value" id="glyphSizeVal">26px</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="glyphOffsetY">Ajuste Vertical (Y)</label>
-                                <div class="slider-container">
-                                    <input type="range" id="glyphOffsetY" min="-4" max="4" step="0.5" value="0" oninput="onGlyphSettingChange()">
-                                    <span class="slider-value" id="glyphOffsetYVal">0px</span>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="strokeWidth">Espessura do Traço</label>
-                                <div class="slider-container">
-                                    <input type="range" id="strokeWidth" min="1" max="3.5" step="0.25" value="2" oninput="onGlyphSettingChange()">
-                                    <span class="slider-value" id="strokeWidthVal">2px</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- CARD 2: Padrão Cromático & Contorno de Luminosidade -->
-                <section class="studio-card" id="paletas">
-                    <div class="card-header">
-                        <span class="card-title">
-                            <svg class="tabler-ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 10a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                <path d="M6 4v4" />
-                                <path d="M6 12v8" />
-                                <path d="M10 16a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                <path d="M12 4v10" />
-                                <path d="M12 18v2" />
-                                <path d="M16 7a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
-                                <path d="M18 4v1" />
-                                <path d="M18 9v11" />
-                            </svg>
-                            2. Padrão Cromático & Contorno de Luminosidade
-                        </span>
-                    </div>
-                    <div class="card-body">
-
-                        <!-- Cores: Primária e Glifo -->
-                        <div class="custom-color-row">
-                            <div class="color-input-box">
-                                <label class="form-label" for="primaryColor">Cor da Cartela (Fundo)</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="primaryColor" value="#64748b" oninput="onColorPickerChange('primary')">
-                                    <input type="text" id="primaryColorHex" value="#64748b" aria-label="Código Hexadecimal da Cor da Cartela" onchange="onHexInputChange('primary')">
-                                </div>
-                            </div>
-
-                            <div class="color-input-box">
-                                <label class="form-label" for="glyphColor">Cor do Pictograma</label>
-                                <div class="color-input-group">
-                                    <input type="color" id="glyphColor" value="#FFFFFF" oninput="onColorPickerChange('glyph')">
-                                    <input type="text" id="glyphColorHex" value="#FFFFFF" aria-label="Código Hexadecimal da Cor do Pictograma" onchange="onHexInputChange('glyph')">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Paleta Rápida Institucional WETH -->
-                        <div style="margin: 0.9rem 0;">
-                            <label class="form-label" style="font-size: 0.78rem;">Atalhos Institucionais WETH:</label>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                                <button type="button" class="cat-btn active" onclick="setQuickColor('#64748b', '#FFFFFF')" style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #64748b; display: inline-block;"></span>
-                                    Slate Blue Suporte (#64748B) • Padrão
-                                </button>
-                                <button type="button" class="cat-btn" onclick="setQuickColor('#05285b', '#FFFFFF')" style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #05285b; display: inline-block;"></span>
-                                    Azul WETH Oficial (#05285B)
-                                </button>
-                                <button type="button" class="cat-btn" onclick="setQuickColor('#1b4f9b', '#FFFFFF')" style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #1b4f9b; display: inline-block;"></span>
-                                    Azul Ação (#1B4F9B)
-                                </button>
-                                <button type="button" class="cat-btn" onclick="setQuickColor('#031b3e', '#FFFFFF')" style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="width: 10px; height: 10px; border-radius: 50%; background: #031b3e; display: inline-block;"></span>
-                                    Azul Profundo (#031B3E)
-                                </button>
-                            </div>
-                        </div>
-
-                        <!-- Contorno Branco Translúcido (Rim Light) -->
-                        <div class="rim-light-box">
-                            <div class="rim-light-header">
-                                <span class="rim-light-title">
-                                    <svg class="tabler-ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--o-action)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 3l0 3" />
-                                        <path d="M12 18l0 3" />
-                                        <path d="M3 12l3 0" />
-                                        <path d="M18 12l3 0" />
-                                        <path d="M5.6 5.6l2.1 2.1" />
-                                        <path d="M16.3 16.3l2.1 2.1" />
-                                        <path d="M5.6 18.4l2.1 -2.1" />
-                                        <path d="M16.3 7.7l2.1 -2.1" />
-                                    </svg>
-                                    Contorno de Luminosidade (Rim Light)
-                                </span>
-                                <span class="form-hint" style="margin: 0;">Destaca o ícone sobre o fundo escuro do menu</span>
-                            </div>
-
-                            <div class="controls-two-col">
-                                <div class="form-group">
-                                    <label class="form-label" for="rimOpacity">Opacidade do Contorno Branco</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="rimOpacity" min="0" max="60" value="22" oninput="onRimSettingChange()">
-                                        <span class="slider-value" id="rimOpacityVal">22%</span>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label class="form-label" for="rimWidth">Espessura da Borda</label>
-                                    <div class="slider-container">
-                                        <input type="range" id="rimWidth" min="0.5" max="2" step="0.5" value="1" oninput="onRimSettingChange()">
-                                        <span class="slider-value" id="rimWidthVal">1px</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </section>
-            </div>
-
-            <!-- COLUNA DIREITA: Preview Stage e Exportação Oficial -->
-            <div class="preview-column">
-                <div class="preview-sticky-wrap">
-                    
-                    <!-- Live Stage Card -->
-                    <div class="studio-card">
-                        <div class="stage-toolbar">
-                            <span style="font-size: 0.82rem; font-weight: 700; color: var(--o-gray-700);">Visualização do Aplicativo</span>
-                            
-                            <div style="display: flex; gap: 8px; align-items: center;">
-                                <div class="stage-btn-group">
-                                    <button type="button" class="stage-tool-btn" onclick="setStageBg('light', this)" title="Fundo Claro">Claro</button>
-                                    <button type="button" class="stage-tool-btn active" onclick="setStageBg('dark', this)" title="Fundo Escuro Enterprise">Escuro</button>
-                                    <button type="button" class="stage-tool-btn" onclick="setStageBg('navbar', this)" title="Fundo Navbar Oficial">Navbar</button>
-                                    <button type="button" class="stage-tool-btn" onclick="setStageBg('checker', this)" title="Grade de Transparência">Transp.</button>
-                                </div>
-                                <div class="stage-btn-group">
-                                    <button type="button" class="stage-tool-btn" onclick="setStageZoom(100, this)">100%</button>
-                                    <button type="button" class="stage-tool-btn active" onclick="setStageZoom(180, this)">3.6x</button>
-                                    <button type="button" class="stage-tool-btn" onclick="setStageZoom(240, this)">5x</button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Palco Principal (Inicialmente em Dark para destacar o contorno translúcido) -->
-                        <div class="preview-stage-canvas bg-dark" id="previewStage">
-                            <div id="iconContainer"></div>
-                        </div>
-
-                        <div class="stage-meta-footer">
-                            <span>Formato: <b>SVG Nativo (viewBox 0 0 50 50)</b></span>
-                            <span id="metaIconDetails">box • #64748b • stroke 2px</span>
-                        </div>
-                    </div>
-
-                    <!-- Central de Download e Exportação -->
-                    <div class="studio-card">
-                        <div class="card-header">
-                            <span class="card-title">
-                                <svg class="tabler-ui-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
-                                    <path d="M7 11l5 5l5 -5" />
-                                    <path d="M12 4l0 12" />
-                                </svg>
-                                Exportar Arquivos Oficiais
-                            </span>
-                        </div>
-                        <div class="card-body">
-                            <div class="export-actions-grid">
-                                <button type="button" class="btn-weth-primary" onclick="downloadSVG()">
-                                    <svg class="tabler-ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                                        <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                                        <path d="M12 17v-6" />
-                                        <path d="M9.5 14.5l2.5 2.5l2.5 -2.5" />
-                                    </svg>
-                                    Baixar icon.svg (50×50)
-                                </button>
-                                <button type="button" class="btn-weth-secondary" onclick="downloadPNG(128, 'icon.png')">
-                                    <svg class="tabler-ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M15 8h.01" />
-                                        <path d="M3 6a3 3 0 0 1 3 -3h12a3 3 0 0 1 3 3v12a3 3 0 0 1 -3 3h-12a3 3 0 0 1 -3 -3v-12z" />
-                                        <path d="M3 16l5 -5c.928 -.893 2.072 -.893 3 0l5 5" />
-                                        <path d="M14 14l1 -1c.928 -.893 2.072 -.893 3 0l3 3" />
-                                    </svg>
-                                    Baixar icon.png (128×128)
-                                </button>
-                            </div>
-
-                            <div class="secondary-actions-row">
-                                <button type="button" class="btn-copy-code" onclick="downloadPNG(256, 'icon_256.png')">
-                                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-18a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2z" />
-                                        <path d="M7 9v6" />
-                                        <path d="M11 9v6" />
-                                        <path d="M7 12h4" />
-                                        <path d="M14 9v6h2a2 2 0 0 0 2 -2v-2a2 2 0 0 0 -2 -2h-2z" />
-                                    </svg>
-                                    PNG HiDPI (256px)
-                                </button>
-                                <button type="button" class="btn-copy-code" onclick="downloadPNG(512, 'icon_512.png')">
-                                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
-                                    </svg>
-                                    PNG HiDPI (512px)
-                                </button>
-                            </div>
-
-                            <div class="secondary-actions-row" style="margin-top: 8px;">
-                                <button type="button" class="btn-copy-code" onclick="copySVGToClipboard()">
-                                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M8 8m0 2a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v8a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2z" />
-                                        <path d="M16 8v-2a2 2 0 0 0 -2 -2h-8a2 2 0 0 0 -2 2v8a2 2 0 0 0 2 2h2" />
-                                    </svg>
-                                    Copiar XML do SVG
-                                </button>
-                                <button type="button" class="btn-copy-code" onclick="copyDataURIToClipboard()">
-                                    <svg class="tabler-ui-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
-                                        <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
-                                    </svg>
-                                    Copiar Data URI
-                                </button>
-                            </div>
-
-                            <!-- Informações de Atribuição e Licença -->
-                            <div style="margin-top: 1.2rem; padding: 0.75rem; background: var(--o-gray-100); border-radius: var(--radius-sm); border: 1px solid var(--o-gray-200); font-size: 0.72rem; color: var(--o-gray-700);">
-                                <div style="font-weight: 600; margin-bottom: 2px;">Atribuição & Licença MIT:</div>
-                                <div>Pictogramas: <b>Tabler Icons (Outline)</b> por Paweł Kuna (MIT License). Composição geométrica & Cartela: <b>WETH Icon Studio</b>.</div>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-    </main>
-
-    <!-- Toast Notification -->
-    <div class="toast-notice" id="toastNotice">
-        <svg class="tabler-ui-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#4ade80" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
-            <path d="M9 12l2 2l4 -4" />
-        </svg>
-        <span id="toastMsg" style="margin-left: 6px;">Copiado com sucesso!</span>
     </div>
 
-    <script>
-        let currentIconInstance = null;
-        let currentRenderSize = 180;
-        let activeMacro = "all";
-        let activeSubCat = "all";
-        let filteredIconKeys = [];
-        let displayedCount = 0;
-        const PAGE_CHUNK = 120;
-
-        // Dicionário de Sinônimos em Português para facilitar a busca no ERP
-        const PT_SYNONYMS = {
-            'estoque': ['box', 'package', 'packages', 'archive', 'building-warehouse', 'barcode', 'qrcode'],
-            'caixa': ['box', 'package', 'archive'],
-            'pacote': ['package', 'box'],
-            'faturamento': ['receipt', 'file-invoice', 'receipt-tax', 'calculator'],
-            'fatura': ['file-invoice', 'receipt', 'file-text'],
-            'recibo': ['receipt', 'receipt-2', 'file-invoice'],
-            'pagamento': ['credit-card', 'cash', 'coin', 'wallet', 'currency-dollar'],
-            'pagamentos': ['credit-card', 'cash', 'coin', 'wallet'],
-            'pdv': ['cash-register', 'scan', 'barcode', 'shopping-cart'],
-            'caixa-registradora': ['cash-register'],
-            'tesouraria': ['building-bank', 'vault', 'safe', 'coin'],
-            'banco': ['building-bank', 'pig-money', 'coin'],
-            'usuario': ['user', 'user-circle', 'user-check'],
-            'usuarios': ['users', 'users-group'],
-            'pessoa': ['user', 'user-check'],
-            'pessoas': ['users', 'users-group'],
-            'grupo': ['users-group', 'folder', 'category'],
-            'loja': ['building-store', 'shopping-bag', 'shopping-cart'],
-            'vendas': ['shopping-cart', 'chart-line', 'cash', 'percentage', 'discount'],
-            'carrinho': ['shopping-cart', 'shopping-bag'],
-            'entrega': ['truck', 'truck-delivery', 'moped', 'package'],
-            'entregas': ['truck', 'truck-delivery'],
-            'frete': ['truck', 'ship', 'plane'],
-            'caminhao': ['truck', 'truck-delivery'],
-            'tarefa': ['clipboard-list', 'checklist', 'list-check'],
-            'tarefas': ['clipboard-list', 'checklist', 'list-check'],
-            'ajuda': ['help', 'help-circle', 'info-circle', 'headset'],
-            'helpdesk': ['headset', 'lifebuoy', 'message-circle-question'],
-            'suporte': ['headset', 'tool', 'lifebuoy'],
-            'analise': ['chart-dots-2', 'chart-bar', 'chart-pie', 'analytics'],
-            'grafico': ['chart-bar', 'chart-line', 'chart-pie', 'chart-arrows'],
-            'configuracoes': ['settings', 'adjustments', 'tool'],
-            'seguranca': ['shield-lock', 'shield-check', 'lock', 'key'],
-            'auditoria': ['shield-check', 'file-check', 'clipboard-check'],
-            'email': ['mail', 'mail-opened', 'send'],
-            'marketing': ['speakerphone', 'brand-campaignmonitor', 'ad'],
-            'calendario': ['calendar', 'calendar-event', 'calendar-time'],
-            'pasta': ['folder', 'folder-open'],
-            'ferramenta': ['tool', 'tools', 'wrench'],
-            'obra': ['cone-2', 'hammer', 'crane'],
-            'construcao': ['cone-2', 'hammer', 'building'],
-            'cartao': ['credit-card', 'id-badge-2'],
-            'calculadora': ['calculator'],
-            'cracha': ['id-badge', 'badge'],
-            'banco-de-dados': ['database', 'server'],
-            'nuvem': ['cloud', 'cloud-upload', 'cloud-download'],
-            'api': ['api', 'webhook', 'code'],
-            'idioma': ['language', 'world'],
-            'codigo-de-barras': ['barcode', 'scan'],
-            'qrcode': ['qrcode'],
-            'casa': ['home', 'building'],
-            'trabalho': ['briefcase', 'building-skyscraper'],
-            'painel': ['dashboard', 'layout-dashboard'],
-            'sincronizar': ['refresh', 'rotate', 'arrows-shuffle'],
-            'upload': ['upload', 'cloud-upload'],
-            'download': ['download', 'cloud-download'],
-            'dinheiro': ['cash', 'coin', 'currency-dollar'],
-            'chat': ['message', 'messages', 'message-circle'],
-            'notificacao': ['bell', 'bell-ringing'],
-            'pesquisa': ['search'],
-            'alerta': ['alert-triangle', 'alert-circle'],
-            'erro': ['circle-x', 'alert-octagon'],
-            'informacao': ['info-circle'],
-            'wifi': ['wifi']
-        };
-
-        document.addEventListener("DOMContentLoaded", function () {
-            buildSubCategoriesDropdown();
-            filterMacro("all");
-            updateIcon();
-
-            // Sincronização ao digitar no campo direto de ícone
-            const iconInput = document.getElementById("iconClass");
-            if (iconInput) {
-                iconInput.addEventListener("input", function () {
-                    const norm = WETH_ICON.normalizeIconName(this.value.trim());
-                    highlightActiveIconGrid(norm);
-                    updateIcon();
-                });
-            }
-        });
-
-        // Constrói dinamicamente o select de subcategorias com contagens exatas
-        function buildSubCategoriesDropdown() {
-            if (!window.TABLER_CATALOG) return;
-            const select = document.getElementById("subCategorySelect");
-            if (!select) return;
-
-            const counts = {};
-            const namesPt = {};
-            const catalog = window.TABLER_CATALOG;
-
-            for (const key in catalog) {
-                const item = catalog[key];
-                const cat = item.c;
-                counts[cat] = (counts[cat] || 0) + 1;
-                namesPt[cat] = item.cp || cat;
-            }
-
-            // Ordena alfabeticamente pelo nome em português
-            const sortedCats = Object.keys(counts).sort((a, b) => namesPt[a].localeCompare(namesPt[b]));
-
-            select.innerHTML = '<option value="all">Todas as 41 Subcategorias Especializadas (5.233 ícones)</option>';
-            sortedCats.forEach(cat => {
-                const opt = document.createElement("option");
-                opt.value = cat;
-                opt.textContent = `${namesPt[cat]} (${counts[cat]} ícones) — ${cat}`;
-                select.appendChild(opt);
-            });
-        }
-
-        function onSearchInputChange() {
-            const searchInput = document.getElementById("iconSearchInput");
-            const query = (searchInput ? searchInput.value.trim() : "").toLowerCase();
-            
-            // Quando o usuário pesquisa por texto livre, redefine para Todas para busca global
-            if (query && (activeMacro !== "all" || activeSubCat !== "all")) {
-                activeMacro = "all";
-                activeSubCat = "all";
-                document.querySelectorAll(".category-filter-chips .cat-btn").forEach(b => b.classList.remove("active"));
-                const btnAll = document.getElementById("btnCatAll");
-                if (btnAll) btnAll.classList.add("active");
-                const select = document.getElementById("subCategorySelect");
-                if (select) select.value = "all";
-            }
-
-            applyCategoryAndSearchFilter();
-        }
-
-        function filterMacro(macro, btn) {
-            activeMacro = macro;
-            activeSubCat = "all";
-            
-            // Atualiza chips
-            document.querySelectorAll("#macroCategoryChips .cat-btn").forEach(b => b.classList.remove("active"));
-            if (btn) {
-                btn.classList.add("active");
-            } else if (macro === "all") {
-                const btnAll = document.getElementById("btnCatAll");
-                if (btnAll) btnAll.classList.add("active");
-            }
-
-            // Atualiza select de subcategoria
-            const select = document.getElementById("subCategorySelect");
-            if (select) select.value = "all";
-
-            applyCategoryAndSearchFilter();
-        }
-
-        function onSubCategoryChange() {
-            const select = document.getElementById("subCategorySelect");
-            if (!select) return;
-            activeSubCat = select.value;
-
-            // Se selecionou uma subcategoria específica, atualiza o chip macro se aplicável
-            if (activeSubCat !== "all" && window.TABLER_CATALOG) {
-                // Descobre a macro da subcategoria escolhida
-                for (const k in window.TABLER_CATALOG) {
-                    if (window.TABLER_CATALOG[k].c === activeSubCat) {
-                        activeMacro = window.TABLER_CATALOG[k].m;
-                        break;
-                    }
-                }
-                document.querySelectorAll("#macroCategoryChips .cat-btn").forEach(b => b.classList.remove("active"));
-                const targetBtn = document.querySelector(`#macroCategoryChips button[onclick*="'${activeMacro}'"]`);
-                if (targetBtn) targetBtn.classList.add("active");
-            }
-
-            applyCategoryAndSearchFilter();
-        }
-
-        function applyCategoryAndSearchFilter() {
-            if (!window.TABLER_CATALOG) return;
-
-            const catalog = window.TABLER_CATALOG;
-            const allKeys = Object.keys(catalog);
-            const searchInput = document.getElementById("iconSearchInput");
-            const query = (searchInput ? searchInput.value.trim() : "").toLowerCase();
-
-            // Resolução de sinônimos em português
-            let expandedTerms = [];
-            if (query) {
-                expandedTerms.push(query);
-                for (const ptWord in PT_SYNONYMS) {
-                    if (query.includes(ptWord) || ptWord.includes(query)) {
-                        expandedTerms.push(...PT_SYNONYMS[ptWord]);
-                    }
-                }
-            }
-
-            filteredIconKeys = allKeys.filter(key => {
-                const item = catalog[key];
-
-                // 1. Filtro por subcategoria específica
-                if (activeSubCat !== "all" && item.c !== activeSubCat) {
-                    return false;
-                }
-
-                // 2. Filtro por macro-categoria WETH
-                if (activeSubCat === "all" && activeMacro !== "all" && item.m !== activeMacro) {
-                    return false;
-                }
-
-                // 3. Filtro por texto/pesquisa livre
-                if (query) {
-                    const keyLower = key.toLowerCase();
-                    const catLower = item.c.toLowerCase();
-                    const catPtLower = (item.cp || "").toLowerCase();
-                    const macroLower = (item.mp || "").toLowerCase();
-
-                    // Match no nome
-                    if (keyLower.includes(query)) return true;
-                    // Match na categoria
-                    if (catLower.includes(query) || catPtLower.includes(query) || macroLower.includes(query)) return true;
-                    // Match nas tags
-                    if (item.t && item.t.some(tag => tag.toLowerCase().includes(query))) return true;
-                    // Match nos termos expandidos
-                    if (expandedTerms.some(term => keyLower.includes(term))) return true;
-
-                    return false;
-                }
-
-                return true;
-            });
-
-            // Atualiza contador
-            const countEl = document.getElementById("searchResultCount");
-            if (countEl) {
-                let catLabel = "Todos";
-                if (activeSubCat !== "all") {
-                    const firstMatch = catalog[filteredIconKeys[0]];
-                    catLabel = firstMatch ? (firstMatch.cp || activeSubCat) : activeSubCat;
-                } else if (activeMacro !== "all") {
-                    const activeChip = document.querySelector("#macroCategoryChips .cat-btn.active");
-                    catLabel = activeChip ? activeChip.textContent : activeMacro;
-                }
-                countEl.textContent = `${filteredIconKeys.length} ícones (${catLabel})`;
-            }
-
-            // Reseta grade e renderiza primeiro lote
-            const grid = document.getElementById("iconSelectorGrid");
-            if (grid) grid.innerHTML = "";
-            displayedCount = 0;
-            renderNextBatch();
-        }
-
-        function renderNextBatch() {
-            const grid = document.getElementById("iconSelectorGrid");
-            if (!grid || !window.TABLER_CATALOG) return;
-
-            const iconInput = document.getElementById("iconClass");
-            const currentIcon = iconInput ? WETH_ICON.normalizeIconName(iconInput.value) : "box";
-
-            const nextIndex = Math.min(displayedCount + PAGE_CHUNK, filteredIconKeys.length);
-            const batch = filteredIconKeys.slice(displayedCount, nextIndex);
-
-            const fragment = document.createDocumentFragment();
-
-            batch.forEach(key => {
-                const item = window.TABLER_CATALOG[key];
-                const el = document.createElement("div");
-                el.className = `icon-choice-item ${key === currentIcon ? "active" : ""}`;
-                el.dataset.name = key;
-                el.title = `${key} • ${item.cp || item.c} (${item.mp})`;
-
-                // Renderiza SVG inline otimizado do Tabler
-                let pathsSvg = "";
-                if (item.p) {
-                    pathsSvg = item.p.map(p => {
-                        if (typeof p === 'string') return `<path d="${p}" />`;
-                        if (p && p.d) return `<path d="${p.d}"${p.opacity ? ` opacity="${p.opacity}"` : ''} />`;
-                        return '';
-                    }).join('');
-                }
-
-                el.innerHTML = `
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        ${pathsSvg}
-                    </svg>
-                    <span class="icon-choice-name">${key}</span>
-                    <span class="icon-choice-cat">${item.cp || item.c}</span>
-                `;
-                el.onclick = () => selectIconFromGrid(key);
-                fragment.appendChild(el);
-            });
-
-            grid.appendChild(fragment);
-            displayedCount = nextIndex;
-
-            // Botão carregar mais
-            const loadMoreWrap = document.getElementById("loadMoreWrap");
-            if (loadMoreWrap) {
-                loadMoreWrap.style.display = displayedCount < filteredIconKeys.length ? "block" : "none";
-            }
-        }
-
-        function loadMoreIcons() {
-            renderNextBatch();
-        }
-
-        function selectIconFromGrid(iconName) {
-            const iconInput = document.getElementById("iconClass");
-            if (iconInput) iconInput.value = iconName;
-            highlightActiveIconGrid(iconName);
-            updateIcon();
-        }
-
-        function highlightActiveIconGrid(iconName) {
-            document.querySelectorAll(".icon-choice-item").forEach(el => {
-                if (el.dataset.name === iconName) {
-                    el.classList.add("active");
-                } else {
-                    el.classList.remove("active");
-                }
-            });
-        }
-
-        function onColorPickerChange(type) {
-            if (type === "primary") {
-                const hexEl = document.getElementById("primaryColor");
-                const hexInput = document.getElementById("primaryColorHex");
-                if (hexEl && hexInput) hexInput.value = hexEl.value;
-            } else if (type === "glyph") {
-                const hexEl = document.getElementById("glyphColor");
-                const hexInput = document.getElementById("glyphColorHex");
-                if (hexEl && hexInput) hexInput.value = hexEl.value;
-            }
-            updateIcon();
-        }
-
-        function setQuickColor(primary, glyph = '#FFFFFF') {
-            const setVal = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.value = val;
-            };
-            setVal("primaryColor", primary);
-            setVal("primaryColorHex", primary);
-            setVal("glyphColor", glyph);
-            setVal("glyphColorHex", glyph);
-            updateIcon();
-        }
-
-        function onHexInputChange(type) {
-            const inputId = type + "ColorHex";
-            const pickerId = type + "Color";
-            const inputEl = document.getElementById(inputId);
-            const pickerEl = document.getElementById(pickerId);
-            if (!inputEl) return;
-            let val = inputEl.value.trim();
-            if (!val.startsWith("#")) val = "#" + val;
-            if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
-                if (pickerEl) pickerEl.value = val;
-                updateIcon();
-            }
-        }
-
-        function onGlyphSettingChange() {
-            const sizeEl = document.getElementById("glyphSize");
-            const offsetYEl = document.getElementById("glyphOffsetY");
-            const strokeEl = document.getElementById("strokeWidth");
-
-            const size = sizeEl ? sizeEl.value : 26;
-            const offsetY = offsetYEl ? offsetYEl.value : 0;
-            const stroke = strokeEl ? strokeEl.value : 2;
-
-            const sizeVal = document.getElementById("glyphSizeVal");
-            const offsetYVal = document.getElementById("glyphOffsetYVal");
-            const strokeVal = document.getElementById("strokeWidthVal");
-
-            if (sizeVal) sizeVal.textContent = size + "px";
-            if (offsetYVal) offsetYVal.textContent = offsetY + "px";
-            if (strokeVal) strokeVal.textContent = stroke + "px";
-            updateIcon();
-        }
-
-        function onRimSettingChange() {
-            const opacityEl = document.getElementById("rimOpacity");
-            const widthEl = document.getElementById("rimWidth");
-            const opacity = opacityEl ? opacityEl.value : 22;
-            const width = widthEl ? widthEl.value : 1;
-            const opacityVal = document.getElementById("rimOpacityVal");
-            const widthVal = document.getElementById("rimWidthVal");
-            if (opacityVal) opacityVal.textContent = opacity + "%";
-            if (widthVal) widthVal.textContent = width + "px";
-            updateIcon();
-        }
-
-        function loadReferenceIcon() {
-            const setVal = (id, val) => {
-                const el = document.getElementById(id);
-                if (el) el.value = val;
-            };
-            const setText = (id, txt) => {
-                const el = document.getElementById(id);
-                if (el) el.textContent = txt;
-            };
-
-            setVal("iconClass", "box");
-            setVal("primaryColor", "#64748b");
-            setVal("primaryColorHex", "#64748b");
-            setVal("glyphColor", "#FFFFFF");
-            setVal("glyphColorHex", "#FFFFFF");
-            setVal("glyphSize", "26");
-            setText("glyphSizeVal", "26px");
-            setVal("glyphOffsetY", "0");
-            setText("glyphOffsetYVal", "0px");
-            setVal("strokeWidth", "2");
-            setText("strokeWidthVal", "2px");
-            setVal("rimOpacity", "22");
-            setText("rimOpacityVal", "22%");
-            setVal("rimWidth", "1");
-            setText("rimWidthVal", "1px");
-
-            highlightActiveIconGrid("box");
-            updateIcon();
-            showToast("Ícone de referência Slate Blue (#64748B) • Tabler Outline carregado!");
-        }
-
-        function updateIcon() {
-            const iconInput = document.getElementById("iconClass");
-            const iconName = (iconInput ? iconInput.value.trim() : "") || "box";
-            const normName = WETH_ICON.normalizeIconName(iconName);
-
-            const primaryInput = document.getElementById("primaryColor");
-            const primary = primaryInput ? primaryInput.value : "#64748b";
-
-            const glyphInput = document.getElementById("glyphColor");
-            const glyphColor = glyphInput ? glyphInput.value : "#FFFFFF";
-
-            const glyphSizeInput = document.getElementById("glyphSize");
-            const glyphSize = glyphSizeInput ? parseInt(glyphSizeInput.value, 10) : 26;
-
-            const glyphOffsetYInput = document.getElementById("glyphOffsetY");
-            const glyphOffsetY = glyphOffsetYInput ? parseFloat(glyphOffsetYInput.value) : 0;
-
-            const strokeInput = document.getElementById("strokeWidth");
-            const strokeWidth = strokeInput ? parseFloat(strokeInput.value) : 2;
-
-            const rimOpacityInput = document.getElementById("rimOpacity");
-            const rimOpacity = rimOpacityInput ? (parseFloat(rimOpacityInput.value) / 100) : 0.22;
-
-            const rimWidthInput = document.getElementById("rimWidth");
-            const rimWidth = rimWidthInput ? parseFloat(rimWidthInput.value) : 1;
-
-            // Metadados
-            const metaEl = document.getElementById("metaIconDetails");
-            let catName = "";
-            if (window.TABLER_CATALOG && window.TABLER_CATALOG[normName]) {
-                catName = ` • ${window.TABLER_CATALOG[normName].cp || window.TABLER_CATALOG[normName].c}`;
-            }
-            if (metaEl) metaEl.textContent = `${normName}${catName} • ${primary} • stroke ${strokeWidth}px`;
-
-            currentIconInstance = new WETH_ICON({
-                icon_class: normName,
-                primary_color: primary,
-                font_color: glyphColor,
-                glyph_size: glyphSize,
-                glyph_offset_y: glyphOffsetY,
-                stroke_width: strokeWidth,
-                border_opacity: rimOpacity,
-                border_width: rimWidth,
-                render_size: currentRenderSize
-            });
-
-            currentIconInstance.draw("iconContainer");
-        }
-
-        function setStageBg(bg, btn) {
-            const stage = document.getElementById("previewStage");
-            stage.className = `preview-stage-canvas bg-${bg}`;
-            if (btn) {
-                btn.parentElement.querySelectorAll(".stage-tool-btn").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-            }
-        }
-
-        function setStageZoom(size, btn) {
-            currentRenderSize = size;
-            if (btn) {
-                btn.parentElement.querySelectorAll(".stage-tool-btn").forEach(b => b.classList.remove("active"));
-                btn.classList.add("active");
-            }
-            updateIcon();
-        }
-
-        function downloadSVG() {
-            if (!currentIconInstance) return;
-            const svgContent = currentIconInstance.getSVGString();
-            const blob = new Blob([svgContent], { type: "image/svg+xml;charset=utf-8" });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement("a");
-            link.href = url;
-            link.download = "icon.svg";
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-            showToast("icon.svg (50×50 Tabler Outline) baixado com sucesso!");
-        }
-
-        function downloadPNG(size = 128, filename = "icon.png") {
-            if (!currentIconInstance) return;
-            const dataUrl = currentIconInstance.exportPNG(size);
-            const link = document.createElement("a");
-            link.href = dataUrl;
-            link.download = filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            showToast(`${filename} (${size}×${size}) baixado!`);
-        }
-
-        function copySVGToClipboard() {
-            if (!currentIconInstance) return;
-            const svgContent = currentIconInstance.getSVGString();
-            navigator.clipboard.writeText(svgContent).then(() => {
-                showToast("Código XML do SVG Tabler Outline copiado!");
-            });
-        }
-
-        function copyDataURIToClipboard() {
-            if (!currentIconInstance) return;
-            const dataURI = currentIconInstance.getDataURI();
-            navigator.clipboard.writeText(dataURI).then(() => {
-                showToast("Data URI vetorial copiado com sucesso!");
-            });
-        }
-
-        function showToast(msg) {
-            const toast = document.getElementById("toastNotice");
-            const text = document.getElementById("toastMsg");
-            text.textContent = msg;
-            toast.classList.add("visible");
-            setTimeout(() => {
-                toast.classList.remove("visible");
-            }, 3000);
-        }
-    </script>
+    <div class="container">
+        <div class="row">
+            <div class="column">
+                <h2>Documentação</h2>
+            </div>
+        </div>
+        <div class="row">
+            <div class="column">
+                <p class="section-description">
+                    O Gerador de Ícones para o <a href="https://www.weth.com.br/"
+                        rel="external nofollow"><b>WETH</b></a>,
+                    permite criar novos ícones de aplicativo de forma rápida e personalizada, seguindo o estilo visual
+                    do sistema. gerando arquivos PNG e SVG.
+                </p>
+                <p class="section-description">
+                    Para configurar um ícone, basta identificar o nome do ícone Material e inseri-lo no
+                    campo adequado. Consulte a página oficial do Google para encontrar o ícone ideal:
+                </p>
+                <ul>
+                    <li><a href="https://fonts.google.com/icons">Material Symbols</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <footer class="container">
+        <div class="row align-center">
+            <div class="column align-center">
+                <p>© 2025 <a href="https://weth.com.br"><b>WETH</b></a></p>
+            </div>
+        </div>
+    </footer>
 </body>
 
 </html>
