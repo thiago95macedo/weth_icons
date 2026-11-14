@@ -3,10 +3,10 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Gerador de Ícones</title>
-    <meta name="author" content="spilymp">
+    <title>WETH Icon Studio — Gerador de Ícones</title>
+    <meta name="author" content="WETH Tecnologia">
     <meta name="description"
-        content="Um construtor de ícones simples, que oferece a capacidade de criar ícones de aplicativos no estilo dos ícones de aplicativos do sistema WETH.">
+        content="Estúdio oficial de criação e padronização visual de ícones para o ecossistema WETH (viewBox 50x50, PNG 128x128).">
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="stylesheet" type="text/css" href="css/milligram.min.css">
     <link rel="stylesheet" type="text/css" href="css/style.css">
@@ -22,6 +22,28 @@
         let renderedCount = 0;
         const CHUNK_SIZE = 120;
         let filteredIcons = [];
+
+        const CATEGORY_ICONS = {
+            'all': 'apps',
+            'action': 'bolt',
+            'alert': 'warning',
+            'av': 'play_circle',
+            'communication': 'chat',
+            'content': 'content_paste',
+            'device': 'devices',
+            'editor': 'edit_note',
+            'file': 'folder',
+            'hardware': 'memory',
+            'home': 'home',
+            'image': 'image',
+            'maps': 'map',
+            'navigation': 'navigation',
+            'notification': 'notifications',
+            'places': 'storefront',
+            'search': 'search',
+            'social': 'group',
+            'toggle': 'toggle_on'
+        };
 
         document.addEventListener("DOMContentLoaded", function () {
             currentIcon = new WETH_ICON({
@@ -104,13 +126,13 @@
             const categoriesContainer = document.getElementById('catalogCategories');
             categoriesContainer.innerHTML = '';
 
-            // Chip "Todos"
-            const allChip = document.createElement('button');
-            allChip.type = 'button';
-            allChip.className = 'category-chip active';
-            allChip.textContent = `Todos (${MATERIAL_ICONS_CATALOG.icons.length})`;
-            allChip.onclick = () => selectCategory('all', allChip);
-            categoriesContainer.appendChild(allChip);
+            const totalIcons = MATERIAL_ICONS_CATALOG.icons.length;
+            const sidebarTotalEl = document.getElementById('sidebarTotalCount');
+            if (sidebarTotalEl) sidebarTotalEl.textContent = totalIcons;
+
+            // Item "Todos"
+            const allItem = createCategoryItem('all', 'Todos os Ícones', totalIcons, true);
+            categoriesContainer.appendChild(allItem);
 
             // Contagem por categoria
             const catCounts = {};
@@ -121,20 +143,16 @@
             for (const [code, label] of Object.entries(MATERIAL_ICONS_CATALOG.categories)) {
                 const count = catCounts[code] || 0;
                 if (count === 0) continue;
-                const chip = document.createElement('button');
-                chip.type = 'button';
-                chip.className = 'category-chip';
-                chip.textContent = `${label} (${count})`;
-                chip.onclick = () => selectCategory(code, chip);
-                categoriesContainer.appendChild(chip);
+                const item = createCategoryItem(code, label, count, false);
+                categoriesContainer.appendChild(item);
             }
 
             filterIcons();
 
             // Scroll infinito no container da grade
-            const grid = document.getElementById('catalogGrid');
-            grid.addEventListener('scroll', () => {
-                if (grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 160) {
+            const scrollContainer = document.getElementById('catalogGridScroll') || document.getElementById('catalogGrid');
+            scrollContainer.addEventListener('scroll', () => {
+                if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 200) {
                     renderNextChunk();
                 }
             });
@@ -151,10 +169,27 @@
             });
         }
 
-        function selectCategory(cat, chipElement) {
+        function createCategoryItem(code, label, count, isActive) {
+            const iconName = CATEGORY_ICONS[code] || 'category';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'category-item' + (isActive ? ' active' : '');
+            btn.dataset.category = code;
+            btn.innerHTML = `
+                <div class="category-item-left">
+                    <span class="category-icon material-symbols-outlined">${iconName}</span>
+                    <span class="category-label">${label}</span>
+                </div>
+                <span class="category-count">${count}</span>
+            `;
+            btn.onclick = () => selectCategory(code, btn);
+            return btn;
+        }
+
+        function selectCategory(cat, itemElement) {
             currentCategory = cat;
-            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
-            if (chipElement) chipElement.classList.add('active');
+            document.querySelectorAll('.category-item').forEach(c => c.classList.remove('active'));
+            if (itemElement) itemElement.classList.add('active');
             filterIcons();
         }
 
@@ -229,106 +264,145 @@
                 }
             });
         }
+
+        function updateColorFromPicker(type) {
+            if (type === 'bg') {
+                const val = document.getElementById('iconBackgroundColor').value;
+                document.getElementById('iconBackgroundColorText').value = val.toUpperCase();
+            } else {
+                const val = document.getElementById('iconFontColor').value;
+                document.getElementById('iconFontColorText').value = val.toUpperCase();
+            }
+            generate();
+        }
+
+        function updateColorFromText(type) {
+            if (type === 'bg') {
+                let val = document.getElementById('iconBackgroundColorText').value.trim();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    document.getElementById('iconBackgroundColor').value = val;
+                    generate();
+                }
+            } else {
+                let val = document.getElementById('iconFontColorText').value.trim();
+                if (!val.startsWith('#')) val = '#' + val;
+                if (/^#[0-9A-Fa-f]{6}$/.test(val)) {
+                    document.getElementById('iconFontColor').value = val;
+                    generate();
+                }
+            }
+        }
     </script>
 </head>
 
 <body>
-    <div class="font_preload" style="opacity: 0">
-        <span style="font-family: 'Material Symbols Outlined', Arial, sans-serif;"></span>
-    </div>
-
-    <header class="container">
-        <div class="row">
-            <div class="column align-center">
-                <img src="assets/images/logo.png" alt="Logotipo WETH" style="max-width: 350px; height: auto;">
-                <h1>Gerador de Ícones</h1>
-            </div>
+    <header class="studio-topbar">
+        <div class="studio-brand">
+            <img src="assets/images/logo.png" alt="WETH" class="studio-logo">
+            <h1 class="studio-title">
+                Gerador de Ícones
+                <span class="studio-tag">WETH ERP</span>
+            </h1>
+        </div>
+        <div class="studio-top-actions">
+            <a href="https://fonts.google.com/icons" target="_blank" class="btn-topbar">
+                <span class="material-symbols-outlined" style="font-size: 1.6rem;">open_in_new</span>
+                <span>Google Fonts</span>
+            </a>
         </div>
     </header>
 
-    <div class="container">
-        <div class="row row-center">
-            <div class="column align-center settings-card front">
-                <div class="row icon-set-website">
-                    <div class="column column-center column-50">
-                        <label for="iconClass">Ícone Material</label>
-                    </div>
-                    <div class="column column-40">
-                        <input id="iconClass" type="text" placeholder="ex. person, home, settings">
-                    </div>
-                    <div class="column">
-                        <a href="https://fonts.google.com/icons" id="iconSetWebsite" class="button button-outline"
-                            target="_blank">
-                            <i class="material-symbols-outlined button-icon">language</i>
+    <div class="studio-layout">
+        <!-- 1. Left Sidebar: Categorias -->
+        <aside class="studio-sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">Categorias</span>
+                <span class="sidebar-total" id="sidebarTotalCount">0</span>
+            </div>
+            <div class="category-list" id="catalogCategories">
+                <!-- Itens gerados dinamicamente via JS -->
+            </div>
+        </aside>
+
+        <!-- 2. Central Area: Busca + Grade -->
+        <main class="studio-main">
+            <div class="studio-search-bar">
+                <div class="search-input-wrapper">
+                    <span class="search-icon-inside material-symbols-outlined">search</span>
+                    <input type="text" id="catalogSearch" class="catalog-search-input"
+                        placeholder="Buscar por nome ou palavra-chave (ex.: person, settings, receipt, inventory, cart)..."
+                        autocomplete="off">
+                </div>
+                <span id="catalogCounter" class="catalog-counter-badge">Carregando catálogo...</span>
+            </div>
+
+            <div class="studio-grid-scroll" id="catalogGridScroll">
+                <div id="catalogGrid" class="catalog-grid">
+                    <!-- Cards de ícones gerados dinamicamente -->
+                </div>
+            </div>
+        </main>
+
+        <!-- 3. Right Inspector: Preview + Ajustes + Downloads -->
+        <aside class="studio-inspector">
+            <div class="inspector-section">
+                <span class="inspector-title">Pré-visualização</span>
+                <div class="preview-box">
+                    <div id="icon"></div>
+                </div>
+            </div>
+
+            <div class="inspector-section">
+                <span class="inspector-title">Personalização</span>
+
+                <div class="control-item">
+                    <label for="iconClass" class="control-label">Nome do Ícone</label>
+                    <div class="icon-name-input-wrap">
+                        <input type="text" id="iconClass" class="icon-name-input" value="person" placeholder="ex. person, home, settings">
+                        <a href="https://fonts.google.com/icons" id="iconSetWebsite" class="icon-name-link" target="_blank" title="Abrir no Google Fonts">
+                            <span class="material-symbols-outlined" style="font-size: 1.8rem;">open_in_new</span>
                         </a>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="column column-center">
-                        <label for="iconBackgroundColor">Cor do Background</label>
+
+                <div class="color-controls-grid">
+                    <div class="control-item">
+                        <label class="control-label" for="iconBackgroundColor">Fundo</label>
+                        <div class="color-picker-box">
+                            <input type="color" id="iconBackgroundColor" value="#05285B" oninput="updateColorFromPicker('bg')">
+                            <input type="text" id="iconBackgroundColorText" value="#05285B" class="color-hex-text" maxlength="7" oninput="updateColorFromText('bg')">
+                        </div>
                     </div>
-                    <div class="column">
-                        <input type="color" value="#05285B" id="iconBackgroundColor" oninput="generate()">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column column-center">
-                        <label for="iconFontColor">Cor da Fonte</label>
-                    </div>
-                    <div class="column">
-                        <input id="iconFontColor" type="color" value="#ffffff" oninput="generate()">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column align-right">
-                        <button class="button button-outline" type="button" title="Gerar" onclick="generate()">
-                            <i class="material-symbols-outlined button-icon">play_arrow</i>
-                        </button>
-                        <button type="button" onclick="downloadPNG()">PNG</button>
-                        <button type="button" class="button button-outline" onclick="downloadSVG()">SVG</button>
+                    <div class="control-item">
+                        <label class="control-label" for="iconFontColor">Ícone</label>
+                        <div class="color-picker-box">
+                            <input type="color" id="iconFontColor" value="#FFFFFF" oninput="updateColorFromPicker('font')">
+                            <input type="text" id="iconFontColorText" value="#FFFFFF" class="color-hex-text" maxlength="7" oninput="updateColorFromText('font')">
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="column align-center">
-                <div id="icon"></div>
+            <div class="inspector-section">
+                <span class="inspector-title">Exportar Arquivos</span>
+                <div class="download-actions">
+                    <button type="button" class="btn-action-png" onclick="downloadPNG()">
+                        <span class="material-symbols-outlined" style="font-size: 2rem;">download</span>
+                        <span>PNG Oficial (128×128)</span>
+                    </button>
+                    <button type="button" class="btn-action-svg" onclick="downloadSVG()">
+                        <span class="material-symbols-outlined" style="font-size: 2rem;">code</span>
+                        <span>SVG Vetorial (50×50)</span>
+                    </button>
+                </div>
             </div>
-        </div>
+
+            <div class="inspector-footer">
+                © 2025 <a href="https://weth.com.br" target="_blank">WETH Tecnologia</a>
+            </div>
+        </aside>
     </div>
-
-    <section class="container">
-        <div class="catalog-section">
-            <div class="catalog-header">
-                <h2>
-                    <span class="material-symbols-outlined" style="font-size: 2.6rem; vertical-align: middle;">category</span>
-                    Catálogo de Ícones Material
-                </h2>
-                <span id="catalogCounter" class="catalog-counter">Carregando catálogo...</span>
-            </div>
-
-            <div class="catalog-search-wrap">
-                <input type="text" id="catalogSearch" class="catalog-search-input"
-                    placeholder="🔍 Buscar ícones por nome ou palavra-chave (ex.: person, settings, receipt, inventory, cart)..."
-                    autocomplete="off">
-            </div>
-
-            <div id="catalogCategories" class="catalog-categories">
-                <!-- Categorias oficiais geradas dinamicamente -->
-            </div>
-
-            <div id="catalogGrid" class="catalog-grid">
-                <!-- Cards de ícones interativos gerados dinamicamente -->
-            </div>
-        </div>
-    </section>
-
-    <footer class="container">
-        <div class="row align-center">
-            <div class="column align-center">
-                <p>© 2025 <a href="https://weth.com.br"><b>WETH</b></a></p>
-            </div>
-        </div>
-    </footer>
 </body>
 
 </html>
