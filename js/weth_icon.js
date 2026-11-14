@@ -3,11 +3,11 @@ class WETH_ICON {
         // Valores padrão
         this.font_color = "#ffffff";
         this.font_family = "Material Symbols Outlined";
-        this.font_weight = "900";
+        this.font_weight = "300"; // Light por padrão
         this.icon_background = "#05285B";
         this.icon_class = "person";
         this.icon_width = "200"; // Tamanho fixo do ícone
-        this.font_size = "160";  // 80% de 200px (proporção ERP)
+        this.font_size = "140";  // Tamanho calibrado e aumentado suavemente em relação à moldura (70%)
         this.weth_version = "25.0";
 
         // Aplica configurações personalizadas, exceto tamanhos
@@ -25,9 +25,6 @@ class WETH_ICON {
             this.icon_class = this._normalizeIconClass(this.icon_class);
             let ufw = this._getUnicodeAndFontWeight(this.icon_class);
             this.icon_text = ufw[0];
-            if (settings != null && !("font_weight" in settings)) {
-                this.font_weight = ufw[1];
-            }
         }
 
         this._canvas = false;
@@ -48,11 +45,15 @@ class WETH_ICON {
 
     _draw(element) {
         this._setUp();
-        this._setBackground();
-        this._setText();
-        this._setInlineShadow();
-        this._setGradient();
+        this._drawScene(this._ctx);
         document.getElementById(element).appendChild(this.canvas);
+    }
+
+    _drawScene(ctx) {
+        this._setBackground(ctx);
+        this._setText(ctx);
+        this._setInlineShadow(ctx);
+        this._setGradient(ctx);
     }
 
     _setUp() {
@@ -69,45 +70,45 @@ class WETH_ICON {
         this._ctx.font = `${this.font_weight} ${this.font_size}px "${this.font_family}"`;
     }
 
-    _setBackground() {
+    _setBackground(ctx = this._ctx) {
         let radius = this.icon_width * 0.047;
-        this._ctx.beginPath();
+        ctx.beginPath();
         switch (this.weth_version) {
             case "25.0":
-                this._ctx.moveTo(radius, 0);
-                this._ctx.lineTo(this.icon_width - radius, 0);
-                this._ctx.arcTo(this.icon_width, 0, this.icon_width, radius, radius);
-                this._ctx.lineTo(this.icon_width, this.icon_width - radius);
-                this._ctx.arcTo(this.icon_width, this.icon_width, this.icon_width - radius, this.icon_width, radius);
-                this._ctx.lineTo(radius, this.icon_width);
-                this._ctx.arcTo(0, this.icon_width, 0, this.icon_width - radius, radius);
-                this._ctx.lineTo(0, radius);
-                this._ctx.arcTo(0, 0, this.icon_width - radius, 0, radius);
+                ctx.moveTo(radius, 0);
+                ctx.lineTo(this.icon_width - radius, 0);
+                ctx.arcTo(this.icon_width, 0, this.icon_width, radius, radius);
+                ctx.lineTo(this.icon_width, this.icon_width - radius);
+                ctx.arcTo(this.icon_width, this.icon_width, this.icon_width - radius, this.icon_width, radius);
+                ctx.lineTo(radius, this.icon_width);
+                ctx.arcTo(0, this.icon_width, 0, this.icon_width - radius, radius);
+                ctx.lineTo(0, radius);
+                ctx.arcTo(0, 0, this.icon_width - radius, 0, radius);
                 break;
             default:
                 console.log("Not supported version selected.");
                 break;
         }
-        this._ctx.clip();
-        this._ctx.fillStyle = this.icon_background;
-        this._ctx.fill();
+        ctx.clip();
+        ctx.fillStyle = this.icon_background;
+        ctx.fill();
     }
 
-    _setText() {
-        // Ajustar posição vertical para centralização perfeita
+    _setText(ctx = this._ctx) {
+        // Centralização vertical óptica calibrada para em-square de Material Symbols
         let centerX = parseInt(this.icon_width) / 2;
-        let centerY = parseInt(this.icon_width) / 2 + (parseInt(this.font_size) * 0.1); // Ajuste para Material Icons
-        this._drawText(this.icon_text, this.font_color, centerX, centerY, this.font_size);
+        let centerY = (parseInt(this.icon_width) / 2) + Math.round(parseInt(this.font_size) * 0.093);
+        this._drawText(ctx, this.icon_text, this.font_color, centerX, centerY, this.font_size);
     }
 
-    _drawText(text, color, centerX, centerY, font_size) {
-        this._ctx.save();
-        this._ctx.fillStyle = color;
-        this._ctx.font = `${this.font_weight} ${font_size}px "${this.font_family}"`;
-        this._ctx.textAlign = "center";
-        this._ctx.textBaseline = "middle";
-        this._ctx.fillText(`${text}`, centerX, centerY);
-        this._ctx.restore();
+    _drawText(ctx, text, color, centerX, centerY, font_size) {
+        ctx.save();
+        ctx.fillStyle = color;
+        ctx.font = `${this.font_weight} ${font_size}px "${this.font_family}"`;
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`${text}`, centerX, centerY);
+        ctx.restore();
     }
 
     _pSBC(p, c0, c1, l) {
@@ -139,38 +140,38 @@ class WETH_ICON {
     }
 
 
-    _setInlineShadow() {
+    _setInlineShadow(ctx = this._ctx) {
         switch (this.weth_version) {
             case "25.0":
                 let is_radius = this.icon_width * 0.047;
                 let is_height = this.icon_width * 0.015;
-                this._ctx.save();
-                this._ctx.globalAlpha = 0.4;
-                this._ctx.fillStyle = "#282F33";
-                this._ctx.beginPath();
-                this._ctx.moveTo(is_radius - is_height, this.icon_width);
-                this._ctx.lineTo(this.icon_width - is_radius, this.icon_width);
-                this._ctx.arcTo(this.icon_width, this.icon_width, this.icon_width, this.icon_width - is_radius, is_radius);
-                this._ctx.lineTo(this.icon_width, this.icon_width - (is_radius + is_height));
-                this._ctx.arcTo(this.icon_width, this.icon_width - is_height, this.icon_width - is_radius, this.icon_width - is_height, is_radius);
-                this._ctx.lineTo(is_radius, this.icon_width - is_height);
-                this._ctx.arcTo(0, this.icon_width - is_height, 0, this.icon_width - (is_radius + is_height), is_radius);
-                this._ctx.lineTo(0, this.icon_width - is_height);
-                this._ctx.arcTo(0, this.icon_width, is_radius - is_height, this.icon_width, is_radius);
-                this._ctx.fill();
-                this._ctx.fillStyle = "#FFFFFF";
-                this._ctx.beginPath();
-                this._ctx.moveTo(is_radius - is_height, 0);
-                this._ctx.lineTo(this.icon_width - is_radius, 0);
-                this._ctx.arcTo(this.icon_width, 0, this.icon_width, is_radius - is_height, is_radius);
-                this._ctx.lineTo(this.icon_width, is_radius + 2);
-                this._ctx.arcTo(this.icon_width, is_height, this.icon_width - is_radius, is_height, is_radius);
-                this._ctx.lineTo(is_radius, is_height);
-                this._ctx.arcTo(0, is_height, 0, is_radius + is_height, is_radius);
-                this._ctx.lineTo(0, is_radius);
-                this._ctx.arcTo(0, 0, is_radius - is_height, 0, is_radius);
-                this._ctx.fill();
-                this._ctx.restore();
+                ctx.save();
+                ctx.globalAlpha = 0.4;
+                ctx.fillStyle = "#282F33";
+                ctx.beginPath();
+                ctx.moveTo(is_radius - is_height, this.icon_width);
+                ctx.lineTo(this.icon_width - is_radius, this.icon_width);
+                ctx.arcTo(this.icon_width, this.icon_width, this.icon_width, this.icon_width - is_radius, is_radius);
+                ctx.lineTo(this.icon_width, this.icon_width - (is_radius + is_height));
+                ctx.arcTo(this.icon_width, this.icon_width - is_height, this.icon_width - is_radius, this.icon_width - is_height, is_radius);
+                ctx.lineTo(is_radius, this.icon_width - is_height);
+                ctx.arcTo(0, this.icon_width - is_height, 0, this.icon_width - (is_radius + is_height), is_radius);
+                ctx.lineTo(0, this.icon_width - is_height);
+                ctx.arcTo(0, this.icon_width, is_radius - is_height, this.icon_width, is_radius);
+                ctx.fill();
+                ctx.fillStyle = "#FFFFFF";
+                ctx.beginPath();
+                ctx.moveTo(is_radius - is_height, 0);
+                ctx.lineTo(this.icon_width - is_radius, 0);
+                ctx.arcTo(this.icon_width, 0, this.icon_width, is_radius - is_height, is_radius);
+                ctx.lineTo(this.icon_width, is_radius + 2);
+                ctx.arcTo(this.icon_width, is_height, this.icon_width - is_radius, is_height, is_radius);
+                ctx.lineTo(is_radius, is_height);
+                ctx.arcTo(0, is_height, 0, is_radius + is_height, is_radius);
+                ctx.lineTo(0, is_radius);
+                ctx.arcTo(0, 0, is_radius - is_height, 0, is_radius);
+                ctx.fill();
+                ctx.restore();
                 break;
             default:
                 console.log("Not supported version selected.");
@@ -178,17 +179,17 @@ class WETH_ICON {
         }
     }
 
-    _setGradient() {
+    _setGradient(ctx = this._ctx) {
         switch (this.weth_version) {
             case "25.0":
-                this._ctx.save();
-                this._ctx.globalAlpha = 0.2;
-                var gradient = this._ctx.createLinearGradient(0, this.icon_width, this.icon_width, 0);
+                ctx.save();
+                ctx.globalAlpha = 0.2;
+                var gradient = ctx.createLinearGradient(0, this.icon_width, this.icon_width, 0);
                 gradient.addColorStop(0, "rgba(0,0,0,0)");
                 gradient.addColorStop(1, "#FFFFFF");
-                this._ctx.fillStyle = gradient;
-                this._ctx.fillRect(0, 0, this.icon_width, this.icon_width);
-                this._ctx.restore();
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, this.icon_width, this.icon_width);
+                ctx.restore();
                 break;
             default:
                 console.log("Not supported version selected.");
@@ -225,8 +226,54 @@ class WETH_ICON {
         return [char, font_weight];
     }
 
-    // SVG removido - foco apenas em PNG
+    exportPNG(resolution = 128) {
+        const offCanvas = document.createElement("canvas");
+        offCanvas.width = resolution;
+        offCanvas.height = resolution;
+        const offCtx = offCanvas.getContext("2d");
 
+        offCtx.clearRect(0, 0, resolution, resolution);
+        offCtx.save();
+        const scale = resolution / parseInt(this.icon_width);
+        offCtx.scale(scale, scale);
 
-    // Função removida - não mais necessária
+        this._drawScene(offCtx);
+        offCtx.restore();
+
+        return offCanvas.toDataURL("image/png");
+    }
+
+    generateSVG(size = 50) {
+        const scale = size / parseInt(this.icon_width);
+        const radius = (parseInt(this.icon_width) * 0.047 * scale).toFixed(2);
+        const is_height = (parseInt(this.icon_width) * 0.015 * scale).toFixed(2);
+        const fontSize = (parseInt(this.font_size) * scale).toFixed(1);
+        const centerX = (size / 2).toFixed(1);
+        const centerY = (size / 2).toFixed(1); // Centralização precisa em SVG com dominant-baseline="central"
+        const shadowBottomY = (size - parseFloat(is_height)).toFixed(2);
+
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <defs>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
+        </style>
+        <linearGradient id="overlayGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
+            <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.2"/>
+        </linearGradient>
+        <clipPath id="wethClip">
+            <rect width="${size}" height="${size}" rx="${radius}"/>
+        </clipPath>
+    </defs>
+    <g clip-path="url(#wethClip)">
+        <rect width="${size}" height="${size}" fill="${this.icon_background}"/>
+        <rect width="${size}" height="${size}" fill="url(#overlayGrad)"/>
+        <path d="M0 0h${size}v${is_height}h-${size}z" fill="#FFFFFF" fill-opacity="0.4"/>
+        <path d="M0 ${shadowBottomY}h${size}v${is_height}h-${size}z" fill="#282F33" fill-opacity="0.4"/>
+        <text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="central"
+              font-family="'Material Symbols Outlined'" font-size="${fontSize}"
+              font-weight="${this.font_weight}" fill="${this.font_color}">${this.icon_text}</text>
+    </g>
+</svg>`;
+    }
 }

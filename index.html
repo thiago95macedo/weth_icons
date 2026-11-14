@@ -12,63 +12,222 @@
     <link rel="stylesheet" type="text/css" href="css/style.css">
     <link rel="stylesheet" type="text/css"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200">
+    <script type="text/javascript" src="js/material_icons_catalog.js"></script>
     <script type="text/javascript" src="js/weth_icon.js"></script>
 
     <script>
+        let currentIcon = null;
+        let currentCategory = 'all';
+        let searchQuery = '';
+        let renderedCount = 0;
+        const CHUNK_SIZE = 120;
+        let filteredIcons = [];
+
         document.addEventListener("DOMContentLoaded", function () {
-            let icon = new WETH_ICON({
+            currentIcon = new WETH_ICON({
                 'font_family': 'Material Symbols Outlined',
                 'icon_class': 'person',
+                'font_weight': '300',
                 'icon_width': '200',
-                'font_size': '160'
+                'font_size': '140'
             });
-            icon.draw("icon");
+            currentIcon.draw("icon");
+
+            initCatalog();
+
+            // Sincronização em tempo real quando o usuário digita no input
+            let inputDebounce = null;
+            document.getElementById('iconClass').addEventListener('input', function (e) {
+                clearTimeout(inputDebounce);
+                inputDebounce = setTimeout(() => {
+                    const val = e.target.value.trim();
+                    updateCardSelection(val);
+                    generate();
+                }, 100);
+            });
         });
 
-        function generate() {
-            document.getElementById("icon").innerHTML = '';
-
-            // Obtém o valor do nome do ícone Material
+        function getCurrentIconInstance() {
             let iconValue = document.getElementById('iconClass').value.trim();
-
-            // Se não foi inserido nada, usa um ícone padrão
             if (!iconValue) {
                 iconValue = 'person';
             }
-
-            let icon = new WETH_ICON({
+            return new WETH_ICON({
                 'font_color': document.getElementById('iconFontColor').value,
                 'font_family': 'Material Symbols Outlined',
-                'font_weight': document.getElementById('fontWeight').value,
+                'font_weight': '300',
                 'icon_background': document.getElementById('iconBackgroundColor').value,
                 'icon_class': iconValue,
-                'weth_version': document.getElementById('wethVersion').value,
-                // Tamanho fixo definido no código, não na interface (80% proporção ERP)
                 'icon_width': '200',
-                'font_size': '160'
+                'font_size': '140'
             });
-            icon.draw("icon");
         }
 
-        function toggle_settings() {
-            document.querySelectorAll('.settings-card').forEach(function (element) {
-                element.classList.toggle('deactivated');
-            });
+        function generate() {
+            document.getElementById("icon").innerHTML = '';
+            currentIcon = getCurrentIconInstance();
+            currentIcon.draw("icon");
         }
 
         function downloadPNG() {
-            let image = document.getElementsByClassName('weth-icon-canvas')[0].toDataURL("image/png").replace("image/png", "image/octet-stream");
-            document.getElementById('downloadPNG').setAttribute('href', image);
+            if (!currentIcon) {
+                currentIcon = getCurrentIconInstance();
+            }
+            let dataUrl = currentIcon.exportPNG(128);
+            let link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'icon.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
-        // Função SVG removida - foco apenas em PNG
+        function downloadSVG() {
+            if (!currentIcon) {
+                currentIcon = getCurrentIconInstance();
+            }
+            let svgData = currentIcon.generateSVG(50);
+            let blob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            let url = URL.createObjectURL(blob);
+            let link = document.createElement('a');
+            link.href = url;
+            link.download = 'icon.svg';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+        }
 
-        function populateIconSetWebsite() {
-            let iconSetWebsite = document.getElementById('iconSetWebsite');
-            let iconClassInput = document.getElementById('iconClass');
+        function initCatalog() {
+            if (typeof MATERIAL_ICONS_CATALOG === 'undefined') return;
 
-            iconSetWebsite.href = "https://fonts.google.com/icons";
-            iconClassInput.placeholder = "ex. person, home, settings";
+            const categoriesContainer = document.getElementById('catalogCategories');
+            categoriesContainer.innerHTML = '';
+
+            // Chip "Todos"
+            const allChip = document.createElement('button');
+            allChip.type = 'button';
+            allChip.className = 'category-chip active';
+            allChip.textContent = `Todos (${MATERIAL_ICONS_CATALOG.icons.length})`;
+            allChip.onclick = () => selectCategory('all', allChip);
+            categoriesContainer.appendChild(allChip);
+
+            // Contagem por categoria
+            const catCounts = {};
+            for (const icon of MATERIAL_ICONS_CATALOG.icons) {
+                catCounts[icon.c] = (catCounts[icon.c] || 0) + 1;
+            }
+
+            for (const [code, label] of Object.entries(MATERIAL_ICONS_CATALOG.categories)) {
+                const count = catCounts[code] || 0;
+                if (count === 0) continue;
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'category-chip';
+                chip.textContent = `${label} (${count})`;
+                chip.onclick = () => selectCategory(code, chip);
+                categoriesContainer.appendChild(chip);
+            }
+
+            filterIcons();
+
+            // Scroll infinito no container da grade
+            const grid = document.getElementById('catalogGrid');
+            grid.addEventListener('scroll', () => {
+                if (grid.scrollTop + grid.clientHeight >= grid.scrollHeight - 160) {
+                    renderNextChunk();
+                }
+            });
+
+            // Campo de busca em tempo real
+            const searchInput = document.getElementById('catalogSearch');
+            let searchDebounce = null;
+            searchInput.addEventListener('input', (e) => {
+                clearTimeout(searchDebounce);
+                searchDebounce = setTimeout(() => {
+                    searchQuery = e.target.value.trim().toLowerCase();
+                    filterIcons();
+                }, 100);
+            });
+        }
+
+        function selectCategory(cat, chipElement) {
+            currentCategory = cat;
+            document.querySelectorAll('.category-chip').forEach(c => c.classList.remove('active'));
+            if (chipElement) chipElement.classList.add('active');
+            filterIcons();
+        }
+
+        function filterIcons() {
+            if (typeof MATERIAL_ICONS_CATALOG === 'undefined') return;
+
+            filteredIcons = MATERIAL_ICONS_CATALOG.icons.filter(icon => {
+                const matchesCategory = (currentCategory === 'all' || icon.c === currentCategory);
+                if (!matchesCategory) return false;
+
+                if (!searchQuery) return true;
+                return icon.n.includes(searchQuery) || icon.t.includes(searchQuery);
+            });
+
+            const counter = document.getElementById('catalogCounter');
+            if (counter) {
+                counter.textContent = `${filteredIcons.length} ícone${filteredIcons.length === 1 ? '' : 's'} encontrado${filteredIcons.length === 1 ? '' : 's'}`;
+            }
+
+            const grid = document.getElementById('catalogGrid');
+            grid.innerHTML = '';
+            renderedCount = 0;
+
+            if (filteredIcons.length === 0) {
+                grid.innerHTML = '<div class="catalog-empty">Nenhum ícone encontrado para esta pesquisa.</div>';
+                return;
+            }
+
+            renderNextChunk();
+        }
+
+        function renderNextChunk() {
+            if (renderedCount >= filteredIcons.length) return;
+            const grid = document.getElementById('catalogGrid');
+            const fragment = document.createDocumentFragment();
+
+            const currentVal = document.getElementById('iconClass').value.trim() || 'person';
+            const nextChunk = filteredIcons.slice(renderedCount, renderedCount + CHUNK_SIZE);
+
+            for (const icon of nextChunk) {
+                const card = document.createElement('div');
+                card.className = 'icon-card' + (icon.n === currentVal ? ' active' : '');
+                card.dataset.name = icon.n;
+                card.title = icon.n;
+
+                card.innerHTML = `
+                    <span class="icon-card-glyph">${icon.n}</span>
+                    <span class="icon-card-name">${icon.n}</span>
+                `;
+
+                card.onclick = () => selectIcon(icon.n);
+                fragment.appendChild(card);
+            }
+
+            grid.appendChild(fragment);
+            renderedCount += nextChunk.length;
+        }
+
+        function selectIcon(iconName) {
+            const input = document.getElementById('iconClass');
+            input.value = iconName;
+            updateCardSelection(iconName);
+            generate();
+        }
+
+        function updateCardSelection(iconName) {
+            document.querySelectorAll('.icon-card').forEach(c => {
+                if (c.dataset.name === iconName) {
+                    c.classList.add('active');
+                } else {
+                    c.classList.remove('active');
+                }
+            });
         }
     </script>
 </head>
@@ -90,16 +249,6 @@
     <div class="container">
         <div class="row row-center">
             <div class="column align-center settings-card front">
-                <div class="row">
-                    <div class="column column-center">
-                        <label for="wethVersion">WETH Versão</label>
-                    </div>
-                    <div class="column">
-                        <select id="wethVersion">
-                            <option value="25.0">25.0</option>
-                        </select>
-                    </div>
-                </div>
                 <div class="row icon-set-website">
                     <div class="column column-center column-50">
                         <label for="iconClass">Ícone Material</label>
@@ -119,60 +268,24 @@
                         <label for="iconBackgroundColor">Cor do Background</label>
                     </div>
                     <div class="column">
-                        <input type="color" onchange="clickColor(0, -1, -1, 5)" value="#05285B"
-                            id="iconBackgroundColor">
+                        <input type="color" value="#05285B" id="iconBackgroundColor" oninput="generate()">
                     </div>
                 </div>
-                <div class="row">
-                    <div class="column align-right">
-                        <button class="button button-outline" type="submit" value="Switch Settings"
-                            onclick="toggle_settings()">
-                            <i class="material-symbols-outlined button-icon">tune</i>
-                        </button>
-                        <button class="button button-outline" type="submit" value="Generate" onclick="generate()">
-                            <i class="material-symbols-outlined button-icon">play_arrow</i>
-                        </button>
-                        <a id="downloadPNG" download="weth_icon.png">
-                            <button type="submit" value="Download PNG" onclick="downloadPNG()">Download PNG</button>
-                        </a>
-                        <!-- Botão SVG removido - foco apenas em PNG -->
-                    </div>
-                </div>
-            </div>
-
-            <div class="column align-center settings-card back deactivated">
                 <div class="row">
                     <div class="column column-center">
                         <label for="iconFontColor">Cor da Fonte</label>
                     </div>
                     <div class="column">
-                        <input id="iconFontColor" type="color" onchange="clickColor(0, -1, -1, 5)" value="#ffffff">
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="column column-center">
-                        <label for="fontWeight">Peso da Fonte</label>
-                    </div>
-                    <div class="column">
-                        <select id="fontWeight">
-                            <option value="900" selected>Normal</option>
-                            <option value="300">Light</option>
-                        </select>
+                        <input id="iconFontColor" type="color" value="#ffffff" oninput="generate()">
                     </div>
                 </div>
                 <div class="row">
                     <div class="column align-right">
-                        <button class="button button-outline" type="submit" value="Switch Settings"
-                            onclick="toggle_settings()">
-                            <i class="material-symbols-outlined button-icon">tune</i>
-                        </button>
-                        <button class="button button-outline" type="submit" value="Generate" onclick="generate()">
+                        <button class="button button-outline" type="button" title="Gerar" onclick="generate()">
                             <i class="material-symbols-outlined button-icon">play_arrow</i>
                         </button>
-                        <a id="downloadPNG" download="weth_icon.png">
-                            <button type="submit" value="Download PNG" onclick="downloadPNG()">Download PNG</button>
-                        </a>
-                        <!-- Botão SVG removido - foco apenas em PNG -->
+                        <button type="button" onclick="downloadPNG()">PNG</button>
+                        <button type="button" class="button button-outline" onclick="downloadSVG()">SVG</button>
                     </div>
                 </div>
             </div>
@@ -183,30 +296,31 @@
         </div>
     </div>
 
-    <div class="container">
-        <div class="row">
-            <div class="column">
-                <h2>Documentação</h2>
+    <section class="container">
+        <div class="catalog-section">
+            <div class="catalog-header">
+                <h2>
+                    <span class="material-symbols-outlined" style="font-size: 2.6rem; vertical-align: middle;">category</span>
+                    Catálogo de Ícones Material
+                </h2>
+                <span id="catalogCounter" class="catalog-counter">Carregando catálogo...</span>
+            </div>
+
+            <div class="catalog-search-wrap">
+                <input type="text" id="catalogSearch" class="catalog-search-input"
+                    placeholder="🔍 Buscar ícones por nome ou palavra-chave (ex.: person, settings, receipt, inventory, cart)..."
+                    autocomplete="off">
+            </div>
+
+            <div id="catalogCategories" class="catalog-categories">
+                <!-- Categorias oficiais geradas dinamicamente -->
+            </div>
+
+            <div id="catalogGrid" class="catalog-grid">
+                <!-- Cards de ícones interativos gerados dinamicamente -->
             </div>
         </div>
-        <div class="row">
-            <div class="column">
-                <p class="section-description">
-                    O Gerador de Ícones para o <a href="https://www.weth.com.br/"
-                        rel="external nofollow"><b>WETH</b></a>,
-                    permite criar novos ícones de aplicativo de forma rápida e personalizada, seguindo o estilo visual
-                    do sistema. gerando arquivos PNG e SVG.
-                </p>
-                <p class="section-description">
-                    Para configurar um ícone, basta identificar o nome do ícone Material e inseri-lo no
-                    campo adequado. Consulte a página oficial do Google para encontrar o ícone ideal:
-                </p>
-                <ul>
-                    <li><a href="https://fonts.google.com/icons">Material Symbols</a></li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    </section>
 
     <footer class="container">
         <div class="row align-center">

@@ -71,6 +71,177 @@ footer {
 }
 
 /**
+ * Catálogo e Grade de Ícones Material
+ */
+.catalog-section {
+    margin-top: 3rem;
+    margin-bottom: 3rem;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 2.2rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.catalog-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+}
+
+.catalog-header h2 {
+    margin: 0;
+    font-size: 2.2rem;
+    color: #05285B;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.catalog-counter {
+    font-size: 1.3rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.catalog-search-wrap {
+    margin-bottom: 1.2rem;
+    position: relative;
+}
+
+.catalog-search-input {
+    width: 100% !important;
+    height: 4.4rem !important;
+    font-size: 1.5rem !important;
+    padding: 0 1.5rem !important;
+    border: 1.5px solid #cbd5e1 !important;
+    border-radius: 6px !important;
+    box-sizing: border-box !important;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.catalog-search-input:focus {
+    border-color: #05285B !important;
+    box-shadow: 0 0 0 3px rgba(5, 40, 91, 0.12) !important;
+}
+
+.catalog-categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.4rem;
+    max-height: 120px;
+    overflow-y: auto;
+    padding: 4px 2px;
+}
+
+.category-chip {
+    padding: 0.4rem 1.3rem !important;
+    height: auto !important;
+    line-height: 1.6 !important;
+    font-size: 1.25rem !important;
+    border-radius: 20px !important;
+    text-transform: none !important;
+    font-weight: 500 !important;
+    cursor: pointer;
+    border: 1px solid #cbd5e1 !important;
+    color: #475569 !important;
+    background: #f8fafc !important;
+    transition: all 0.15s ease;
+    margin-bottom: 0 !important;
+}
+
+.category-chip:hover {
+    background: #e2e8f0 !important;
+    color: #0f172a !important;
+    border-color: #94a3b8 !important;
+}
+
+.category-chip.active {
+    background: #05285B !important;
+    color: #ffffff !important;
+    border-color: #05285B !important;
+    box-shadow: 0 2px 4px rgba(5, 40, 91, 0.25);
+}
+
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+    gap: 8px;
+    max-height: 440px;
+    overflow-y: auto;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+}
+
+.icon-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 6px;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease, box-shadow 0.12s ease;
+    user-select: none;
+    text-align: center;
+    overflow: hidden;
+}
+
+.icon-card:hover {
+    transform: translateY(-2px);
+    border-color: #94a3b8;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+}
+
+.icon-card.active {
+    border-color: #05285B;
+    background: #f0fdf4;
+    box-shadow: 0 0 0 2px #05285B;
+}
+
+.icon-card-glyph {
+    font-size: 32px !important;
+    line-height: 1;
+    margin-bottom: 6px;
+    color: #05285B;
+    font-family: 'Material Symbols Outlined' !important;
+    font-weight: 300 !important;
+    pointer-events: none;
+    display: inline-block;
+    max-width: 48px;
+    max-height: 36px;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+.icon-card-name {
+    font-size: 1.1rem;
+    color: #334155;
+    max-width: 86px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    pointer-events: none;
+    font-weight: 500;
+}
+
+.catalog-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #64748b;
+    font-size: 1.4rem;
+}
+
+/**
  * Special classe to toggle the settings.
  */
 .settings-card.deactivated {
