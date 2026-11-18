@@ -243,20 +243,82 @@ class WETH_ICON {
         return offCanvas.toDataURL("image/png");
     }
 
-    generateSVG(size = 50) {
+    static async fetchVectorPath(iconName, weight = '300') {
+        if (!iconName) iconName = 'person';
+        iconName = iconName.trim().toLowerCase();
+        const weightTag = weight ? `wght${weight}` : 'wght300';
+        const cacheKey = `${iconName}_${weightTag}`;
+
+        if (!WETH_ICON._vectorCache) {
+            WETH_ICON._vectorCache = {};
+        }
+        if (WETH_ICON._vectorCache[cacheKey]) {
+            return WETH_ICON._vectorCache[cacheKey];
+        }
+
+        // Tenta primeiro carregar a variante com a espessura exata (ex.: wght300), com fallback para default
+        const urls = [
+            `https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/${iconName}/${weightTag}/24px.svg`,
+            `https://fonts.gstatic.com/s/i/short-term/release/materialsymbolsoutlined/${iconName}/default/24px.svg`
+        ];
+
+        for (const url of urls) {
+            try {
+                const resp = await fetch(url);
+                if (resp.ok) {
+                    const text = await resp.text();
+                    const vbMatch = text.match(/viewBox=["']([^"']+)["']/i);
+                    const pathMatch = text.match(/<path[^>]*\bd=["']([^"']+)["']/i);
+                    if (pathMatch) {
+                        const data = {
+                            viewBox: vbMatch ? vbMatch[1] : '0 -960 960 960',
+                            d: pathMatch[1]
+                        };
+                        WETH_ICON._vectorCache[cacheKey] = data;
+                        return data;
+                    }
+                }
+            } catch (err) {
+                // Tenta próxima URL
+            }
+        }
+
+        console.warn(`[WETH_ICON] Não foi possível carregar vetor do ícone '${iconName}' (peso: ${weightTag})`);
+        return null;
+    }
+
+    async generateSVG(size = 50) {
         const scale = size / parseInt(this.icon_width);
         const radius = (parseInt(this.icon_width) * 0.047 * scale).toFixed(2);
         const is_height = (parseInt(this.icon_width) * 0.015 * scale).toFixed(2);
-        const fontSize = (parseInt(this.font_size) * scale).toFixed(1);
-        const centerX = (size / 2).toFixed(1);
-        const centerY = (size / 2).toFixed(1); // Centralização precisa em SVG com dominant-baseline="central"
         const shadowBottomY = (size - parseFloat(is_height)).toFixed(2);
+
+        // Tamanho do ícone calibrado em 70% da moldura (ex: 35px para 50x50)
+        const iconSize = (size * 0.70).toFixed(2);
+        const offset = ((size - parseFloat(iconSize)) / 2).toFixed(2);
+
+        // Obtém o path vetorial real do ícone oficial com a espessura calibrada (Light 300)
+        const iconVector = await WETH_ICON.fetchVectorPath(this.icon_class, this.font_weight || '300');
+
+        let iconSvgContent = '';
+        if (iconVector && iconVector.d) {
+            iconSvgContent = `
+        <svg x="${offset}" y="${offset}" width="${iconSize}" height="${iconSize}" viewBox="${iconVector.viewBox}">
+            <path d="${iconVector.d}" fill="${this.font_color}"/>
+        </svg>`;
+        } else {
+            // Fallback caso ocorra falha de rede
+            const fontSize = (parseInt(this.font_size) * scale).toFixed(1);
+            const centerX = (size / 2).toFixed(1);
+            const centerY = (size / 2).toFixed(1);
+            iconSvgContent = `
+        <text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="central"
+              font-family="'Material Symbols Outlined'" font-size="${fontSize}"
+              font-weight="${this.font_weight}" fill="${this.font_color}">${this.icon_text}</text>`;
+        }
 
         return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
     <defs>
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-        </style>
         <linearGradient id="overlayGrad" x1="0%" y1="100%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#000000" stop-opacity="0"/>
             <stop offset="100%" stop-color="#FFFFFF" stop-opacity="0.2"/>
@@ -269,10 +331,7 @@ class WETH_ICON {
         <rect width="${size}" height="${size}" fill="${this.icon_background}"/>
         <rect width="${size}" height="${size}" fill="url(#overlayGrad)"/>
         <path d="M0 0h${size}v${is_height}h-${size}z" fill="#FFFFFF" fill-opacity="0.4"/>
-        <path d="M0 ${shadowBottomY}h${size}v${is_height}h-${size}z" fill="#282F33" fill-opacity="0.4"/>
-        <text x="${centerX}" y="${centerY}" text-anchor="middle" dominant-baseline="central"
-              font-family="'Material Symbols Outlined'" font-size="${fontSize}"
-              font-weight="${this.font_weight}" fill="${this.font_color}">${this.icon_text}</text>
+        <path d="M0 ${shadowBottomY}h${size}v${is_height}h-${size}z" fill="#282F33" fill-opacity="0.4"/>${iconSvgContent}
     </g>
 </svg>`;
     }

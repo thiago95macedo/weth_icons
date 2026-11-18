@@ -528,6 +528,15 @@ html, body {
     box-shadow: 0 4px 8px rgba(5, 40, 91, 0.3);
 }
 
+.btn-action-png-hi {
+    background: #093c7d !important;
+}
+
+.btn-action-png-hi:hover {
+    background: #062b5a !important;
+    box-shadow: 0 4px 8px rgba(9, 60, 125, 0.3);
+}
+
 .btn-action-svg {
     display: flex !important;
     align-items: center !important;
