@@ -20,7 +20,7 @@
         let currentCategory = 'all';
         let searchQuery = '';
         let renderedCount = 0;
-        const CHUNK_SIZE = 120;
+        const CHUNK_SIZE = 600;
         let filteredIcons = [];
 
         const CATEGORY_ICONS = {
@@ -155,10 +155,10 @@
 
             filterIcons();
 
-            // Scroll infinito no container da grade
+            // Scroll infinito no container da grade com margem antecipada
             const scrollContainer = document.getElementById('catalogGridScroll') || document.getElementById('catalogGrid');
             scrollContainer.addEventListener('scroll', () => {
-                if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 200) {
+                if (scrollContainer.scrollTop + scrollContainer.clientHeight >= scrollContainer.scrollHeight - 600) {
                     renderNextChunk();
                 }
             });
@@ -196,6 +196,16 @@
             filterIcons();
         }
 
+        function updateCounter() {
+            const counter = document.getElementById('catalogCounter');
+            if (!counter) return;
+            if (renderedCount < filteredIcons.length) {
+                counter.textContent = `Exibindo ${renderedCount} de ${filteredIcons.length} ícones`;
+            } else {
+                counter.textContent = `${filteredIcons.length} ícone${filteredIcons.length === 1 ? '' : 's'} encontrado${filteredIcons.length === 1 ? '' : 's'}`;
+            }
+        }
+
         function filterIcons() {
             if (typeof MATERIAL_ICONS_CATALOG === 'undefined') return;
 
@@ -207,9 +217,10 @@
                 return icon.n.includes(searchQuery) || icon.t.includes(searchQuery);
             });
 
-            const counter = document.getElementById('catalogCounter');
-            if (counter) {
-                counter.textContent = `${filteredIcons.length} ícone${filteredIcons.length === 1 ? '' : 's'} encontrado${filteredIcons.length === 1 ? '' : 's'}`;
+            // Reseta a barra de rolagem ao trocar de categoria ou busca
+            const scrollContainer = document.getElementById('catalogGridScroll') || document.getElementById('catalogGrid');
+            if (scrollContainer) {
+                scrollContainer.scrollTop = 0;
             }
 
             const grid = document.getElementById('catalogGrid');
@@ -218,19 +229,33 @@
 
             if (filteredIcons.length === 0) {
                 grid.innerHTML = '<div class="catalog-empty">Nenhum ícone encontrado para esta pesquisa.</div>';
+                updateCounter();
                 return;
             }
 
-            renderNextChunk();
+            // Em categorias específicas ou busca filtrada, renderiza 100% dos ícones (sem corte de 120)
+            // Em 'Todos' sem busca, carrega lote inicial generoso de 600 com rolagem contínua e botão de carga total
+            if (currentCategory !== 'all' || searchQuery) {
+                renderChunk(filteredIcons.length);
+            } else {
+                renderChunk(CHUNK_SIZE);
+            }
         }
 
-        function renderNextChunk() {
+        function renderChunk(size = CHUNK_SIZE) {
             if (renderedCount >= filteredIcons.length) return;
+
+            // Remove o botão de carregar mais anterior se existir
+            const existingBtn = document.getElementById('catalogLoadMore');
+            if (existingBtn) {
+                existingBtn.remove();
+            }
+
             const grid = document.getElementById('catalogGrid');
             const fragment = document.createDocumentFragment();
 
             const currentVal = document.getElementById('iconClass').value.trim() || 'person';
-            const nextChunk = filteredIcons.slice(renderedCount, renderedCount + CHUNK_SIZE);
+            const nextChunk = filteredIcons.slice(renderedCount, renderedCount + size);
 
             for (const icon of nextChunk) {
                 const card = document.createElement('div');
@@ -249,6 +274,30 @@
 
             grid.appendChild(fragment);
             renderedCount += nextChunk.length;
+            updateCounter();
+
+            // Se ainda restarem ícones pendentes (ex: ao navegar em 'Todos'), exibe ação de carregar restante
+            if (renderedCount < filteredIcons.length) {
+                const loadMoreContainer = document.createElement('div');
+                loadMoreContainer.id = 'catalogLoadMore';
+                loadMoreContainer.className = 'catalog-load-more';
+                const remaining = filteredIcons.length - renderedCount;
+                loadMoreContainer.innerHTML = `
+                    <button type="button" class="btn-load-all" onclick="renderAllRemaining()">
+                        <span class="material-symbols-outlined" style="font-size: 1.8rem;">expand_more</span>
+                        <span>Carregar todos os ${filteredIcons.length} ícones (+${remaining} restantes)</span>
+                    </button>
+                `;
+                grid.appendChild(loadMoreContainer);
+            }
+        }
+
+        function renderAllRemaining() {
+            renderChunk(filteredIcons.length - renderedCount);
+        }
+
+        function renderNextChunk() {
+            renderChunk(CHUNK_SIZE);
         }
 
         function selectIcon(iconName) {
